@@ -1,10 +1,10 @@
 /*
  * Projekt:         Robotino Team Solidus
- * Autor:           Steck Manuel
+ * Autor:           Steck Manuel/Alain Rohr
  * Datum:           08.06.2013
- * Geändert:        
+ * Geändert:        09.07.2014
  * Änderungsdatum:  
- * Version:         V_1.1.0_Explo
+ * Version:         V_1.3.0
  */
 package MainPack;
 
@@ -21,21 +21,20 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.SimpleLayout;
 
 /**
- *
- * @author stecm1
+ * Start Hauptprogramm (Entry-Point)
  */
 public class Main
 {
 
   public static org.apache.log4j.Logger log = org.apache.log4j.Logger.getRootLogger();
 
-  public static String refBoxIp = "172.26.100.100";
+  public static String refBoxIp = "172.26.255.255";
   public static String refBoxPortIn = "4444";
   public static String refBoxPortOut = "4444";
-  public static String name = "MrPink";
+  public static String name = "Solid1";
   static ComRefBox comRefBox;
   static ComView comView;
-  static JobController way;
+  static JobController jc;
   static StateMachine sm;
   static FieldCommander fc;
   static File ipfile;
@@ -48,7 +47,7 @@ public class Main
   public static void main(String[] args) throws FileNotFoundException, InterruptedException, IOException, AWTException
   {
     //<editor-fold defaultstate="collapsed" desc="comment">
-// Logger instantieren, konfigurieren
+    //Logger instantieren, konfigurieren
     try
     {
       SimpleLayout layout = new SimpleLayout();
@@ -76,7 +75,7 @@ public class Main
     comView = ComView.getInstance();
 
     fc.setVisible(true);
-    way = JobController.getInstance();
+    jc = JobController.getInstance();
 
     try
     {
@@ -90,9 +89,9 @@ public class Main
       refBoxIp = read.getText(ipfile);
       name = read.getText(namefile);
       jerseyNr = getJerseyNr();
-      way.setRoboNameIdx(read.getText(namefile));
-      comRefBox = new ComRefBox(refBoxIp, Integer.valueOf(refBoxPortIn), Integer.valueOf(refBoxPortOut));
+      jc.setRoboNameIdx(read.getText(namefile));
       fc.refbox.roboname.setText(name);
+      comRefBox = new ComRefBox(refBoxIp, Integer.valueOf(refBoxPortIn), Integer.valueOf(refBoxPortOut));
 
     } catch (IOException ex)
     {
@@ -132,7 +131,7 @@ public class Main
   {
     log.debug("Startbutton is clicked");
 
-    sm = new StateMachine(comRefBox, way);
+    sm = new StateMachine(comRefBox, jc);
 
 // Start Robotinos
     //robo.start();
@@ -153,13 +152,13 @@ public class Main
     int nr = 0;
     switch (name)
     {
-      case "MrPink":
+      case "Solid1":
         nr = 1;
         break;
-      case "MrBrown":
+      case "Solid2":
         nr = 2;
         break;
-      case "MrBlond":
+      case "Solid3":
         nr = 3;
         break;
     }

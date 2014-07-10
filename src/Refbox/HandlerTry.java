@@ -37,7 +37,7 @@ import org.robocup_logistics.llsf_msgs.TimeProtos.Time;
 /**
  * @author stecm1/roa empfängt & sendet Meldungen von Refbox
  */
-public class HandlerAct extends Observable implements ProtobufMessageHandler
+public class HandlerTry extends Observable implements ProtobufMessageHandler
 {
   public static final int RED = 0, ORANGE = 1, GREEN = 2;
   FieldCommander fc;
@@ -91,7 +91,7 @@ public class HandlerAct extends Observable implements ProtobufMessageHandler
 
   public String[] machineTyp;
 
-  public HandlerAct(ProtobufBroadcastPeer peer) throws AWTException
+  public HandlerTry(ProtobufBroadcastPeer peer) throws AWTException
   {
     this.peer = peer;
     System.out.println("gestartet");

@@ -32,7 +32,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class MyFakeRobot
 {
-
   private static String ROBOT_NAME;
   private static String TEAM_NAME;
   private static Team TEAM_COLOR;
@@ -57,8 +56,7 @@ public class MyFakeRobot
 
   public static void main(String[] args)
   {
-
-    ROBOT_NAME = "HFTMRobotino1";
+    ROBOT_NAME = "Solid1";
     TEAM_NAME = "Solidus";
     ENCRYPTION_KEY = "randomkey";
     TEAM_COLOR = Team.CYAN;
@@ -73,21 +71,20 @@ public class MyFakeRobot
       e.printStackTrace();
     }
 
-    peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
-    peerPublic.<OrderInfo>add_message(OrderInfo.class);
-    peerPublic.<GameState>add_message(GameState.class);
-    peerPublic.<VersionInfo>add_message(VersionInfo.class);
-    peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
-    peerPublic.<MachineInfo>add_message(MachineInfo.class);
-    peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
-    peerPublic.<RobotInfo>add_message(RobotInfo.class);
+    //peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
+    //peerPublic.<OrderInfo>add_message(OrderInfo.class);
+    //peerPublic.<GameState>add_message(GameState.class);
+    //peerPublic.<VersionInfo>add_message(VersionInfo.class);
+    //peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
+    //peerPublic.<MachineInfo>add_message(MachineInfo.class);
+    //peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
+    //peerPublic.<RobotInfo>add_message(RobotInfo.class);
 
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
     BeaconThread thread = new BeaconThread();
     thread.start();
-
   }
 
   private static class BeaconThread extends Thread
@@ -114,7 +111,14 @@ public class MyFakeRobot
         long nsec = ns - (ms * 1000000L);
 
         Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
-        BeaconSignal bs = BeaconSignal.newBuilder().setTime(t).setSeq(1).setNumber(1).setPeerName(ROBOT_NAME).setTeamName(TEAM_NAME).setTeamColor(TEAM_COLOR).build();
+        BeaconSignal bs = BeaconSignal.newBuilder().
+          setTime(t).
+          setSeq(1).
+          setNumber(1).
+          setPeerName(ROBOT_NAME).
+          setTeamName(TEAM_NAME).
+          setTeamColor(TEAM_COLOR).
+          build();
 
         ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
 
@@ -127,7 +131,6 @@ public class MyFakeRobot
         }
       }
     }
-
   }
 
   private static class Handler implements ProtobufMessageHandler

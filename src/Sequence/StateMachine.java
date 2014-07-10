@@ -5,12 +5,11 @@ import FieldCommander.FieldCommander;
 import MainPack.Main;
 import Refbox.ComRefBox;
 import Tools.Maintenance;
-
 import Traveling.Drive;
 import java.awt.AWTException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.robocup_logistics.llsf_msgs.OrderInfoProtos;
+import org.robocup_logistics.llsf_msgs.GameStateProtos.GameState;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.Order.DeliveryGate;
 
 /**
@@ -80,6 +79,7 @@ public class StateMachine extends Thread {
     {
         while (running)
         {
+            GameState game=ComRefBox.game;
             state = comRefBox.gameState;
             phase = comRefBox.gamePhase;
 

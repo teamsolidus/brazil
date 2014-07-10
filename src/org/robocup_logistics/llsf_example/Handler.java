@@ -126,8 +126,7 @@ public class Handler implements ProtobufMessageHandler {
 				}
 			} catch (InvalidProtocolBufferException e) {
 				e.printStackTrace();
-			}
-			
+			}			
 		}
 	}
 

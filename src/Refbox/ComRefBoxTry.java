@@ -25,9 +25,9 @@ import roboCommunicationTest.RoboComTest.RoboPos;
  *
  * @author stecm1
  */
-public class ComRefBoxAct
+public class ComRefBoxTry
 {
-  public Handler handler;
+  public HandlerOld handler;
   public ProtobufBroadcastPeer peerPublic;
   public ProtobufBroadcastPeer peerPrivate;
 
@@ -37,7 +37,7 @@ public class ComRefBoxAct
   public boolean hasTime;            // Ist noch zeit zur Verfügung
   public int gameTime;               // Aktuelle Spielzeit (EXPLORATION: 0-180, PRODUCTION: 0-900)
 
-  public ComRefBoxAct(String ip, int portIn, int portOut) throws AWTException
+  public ComRefBoxTry(String ip, int portIn, int portOut) throws AWTException
   {
     // --------------------------- Verbinden mit Refbox per UDP ----------------------------
     peerPublic = new ProtobufBroadcastPeer(ip, portIn, portOut);
@@ -52,7 +52,7 @@ public class ComRefBoxAct
     //peer.<RobotInfo>add_message(RobotInfo.class);
     //peer.<RoboPos>add_message(RoboPos.class);      
 
-    handler = new Handler(peerPublic);
+    handler = new HandlerOld(peerPublic);
     peerPublic.register_handler(handler);
 
     try

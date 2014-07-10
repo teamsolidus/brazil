@@ -489,7 +489,7 @@ public class HandlerOld extends Observable implements ProtobufMessageHandler
         String refBoxPortIn = "4444";
         String refBoxPortOut = "4444";
         String name = "MrPink";
-        ComRefBox comRefBox;
+        ComRefBoxTry comRefBox;
         JobController way;
 
         File ipfile;
@@ -509,7 +509,7 @@ public class HandlerOld extends Observable implements ProtobufMessageHandler
             refBoxIp = read.getText(ipfile);
             name = read.getText(namefile);
             way.setRoboNameIdx(read.getText(namefile));
-            comRefBox = new ComRefBox(refBoxIp, Integer.valueOf(refBoxPortIn), Integer.valueOf(refBoxPortOut));
+            comRefBox = new ComRefBoxTry(refBoxIp, Integer.valueOf(refBoxPortIn), Integer.valueOf(refBoxPortOut));
 
             // Nachrichten Refbox                   
             comRefBox.addGameStateMessage();
