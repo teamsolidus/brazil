@@ -512,10 +512,10 @@ public class HandlerOld extends Observable implements ProtobufMessageHandler
             comRefBox = new ComRefBoxTry(refBoxIp, Integer.valueOf(refBoxPortIn), Integer.valueOf(refBoxPortOut));
 
             // Nachrichten Refbox                   
-            comRefBox.addGameStateMessage();
-            comRefBox.addMachineInfo();
-            comRefBox.addExplorationInfo();
-            comRefBox.addOrderInfo();
+//            comRefBox.addGameStateMessage();
+//            comRefBox.addMachineInfo();
+//            comRefBox.addExplorationInfo();
+//            comRefBox.addOrderInfo();
             //comRefBox.addBeaconSignal();    
             //comRefBox.addRoboPos();
         } catch (IOException ex)

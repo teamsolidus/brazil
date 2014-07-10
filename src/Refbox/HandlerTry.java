@@ -98,7 +98,7 @@ public class HandlerTry extends Observable implements ProtobufMessageHandler
     logMessage = "Der Server wurde gestartet !!!";
     fc = FieldCommander.getInstance();
     jc = JobController.getInstance();
-    jc.registerHandler(this);    
+//    jc.registerHandler(this);    
   }
 
   @Override
