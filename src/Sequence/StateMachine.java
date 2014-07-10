@@ -416,7 +416,7 @@ public class StateMachine extends Thread
 
                 case "TO_WAIT_CELL":
                     Main.log.debug("************* STEP TO_WAIT_CELL (1,1) *****************");
-                    drive.setStartPosPhi(way.getDirectionOfMachine("M9 "));
+                    drive.setStartPosPhi(way.getDirectionOfMachine("M9"));
                     drive.setEndTarget(way.getWaitCellBrown());
                     drive.takeNext = true;
                     prodStep = "WAIT_DRIVE";
