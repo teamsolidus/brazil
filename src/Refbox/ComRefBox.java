@@ -124,20 +124,19 @@ public class ComRefBox
     peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
     peerPublic.<VersionInfo>add_message(VersionInfo.class);
     //peerPublic.<RobotInfo>add_message(RobotInfo.class);
-    
+
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
     //BeaconThread thread = new BeaconThread();
     //thread.start();   
-
     fc = FieldCommander.getInstance();
     jc = JobController.getInstance();
     jc.registerComRefBox(this);
   }
 
   public void sendMachine(String name, int[] lamp)
-  {   
+  {
     String type = "";
 
     if (lamp[RED] == mTypLight[0] && lamp[ORANGE] == mTypLight[1] && lamp[GREEN] == mTypLight[2])
@@ -199,8 +198,9 @@ public class ComRefBox
         long nsec = ns - (ms * 1000000L);
 
         Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
-        //Pose2D pos=fc.getPose2D(JERSEY_NR);
-        Pose2D pos = Pose2D.newBuilder().setX(100).setY(100).setOri(0).setTimestamp(t).build();
+
+        int[] xyp = fc.getRoboPos(JERSEY_NR);
+        Pose2D pos = Pose2D.newBuilder().setX(xyp[0]).setY(xyp[1]).setOri(xyp[2]).setTimestamp(t).build();
 
         BeaconSignal bs = BeaconSignal.newBuilder().
           setTime(t).
@@ -215,9 +215,9 @@ public class ComRefBox
         ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
 
         /*if (crypto_setup)
-        {
-          peerPrivate.enqueue(msg);
-        } else*/
+         {
+         peerPrivate.enqueue(msg);
+         } else*/
         {
           peerPublic.enqueue(msg);
         }
@@ -243,7 +243,11 @@ public class ComRefBox
         {
           bs = BeaconSignal.parseFrom(array);
           t = bs.getTime();
-          System.out.printf("Detected robot: %d %s:%s (seq %d)- x:%d/y:%d-%d\n", bs.getNumber(), bs.getTeamName(), bs.getPeerName(), t.getSec(),(int)bs.getPose().getX(),(int)bs.getPose().getY(),(int)bs.getPose().getOri());
+          System.out.printf("Detected robot: %d %s:%s (seq %d)- x:%d/y:%d-%d\n", bs.getNumber(), bs.getTeamName(), bs.getPeerName(), t.getSec(), (int) bs.getPose().getX(), (int) bs.getPose().getY(), (int) bs.getPose().getOri());
+          if (bs.getNumber() != JERSEY_NR && bs.getNumber()>0)
+          {
+            fc.setRoboPos(bs.getNumber(), (int) bs.getPose().getX(), (int) bs.getPose().getY(), (int) bs.getPose().getOri());
+          }
         } catch (InvalidProtocolBufferException e)
         {
           e.printStackTrace();
@@ -325,14 +329,14 @@ public class ComRefBox
 
               peerPrivate.<BeaconSignal>add_message(BeaconSignal.class);
               peerPrivate.<OrderInfo>add_message(OrderInfo.class);
-              peerPrivate.<MachineInfo>add_message(MachineInfo.class);              
-              
+              peerPrivate.<MachineInfo>add_message(MachineInfo.class);
+
               //only send
-              peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);              
-              
+              peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
+
               BeaconThread thread = new BeaconThread();
               thread.start();
-              
+
               Handler handler = new Handler();
               peerPrivate.register_handler(handler);
             }
@@ -399,7 +403,7 @@ public class ComRefBox
         {
           Main.log.error(ex);
         }
-      } 
+      }
     }
 
     public void connection_lost(IOException e)
