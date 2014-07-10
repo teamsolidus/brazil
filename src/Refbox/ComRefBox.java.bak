@@ -112,9 +112,9 @@ public class ComRefBox
     ROBOT_NAME = "Solid3";
     TEAM_NAME = "Solidus";
     ENCRYPTION_KEY = "randomkey";
-    TEAM_COLOR = JobController.TEAM;
+    TEAM_COLOR = Team.CYAN;
     HOST = "172.26.255.255";
-    local = false;  //if refbox is on same machine
+    local = false;
     peerPublic = new ProtobufBroadcastPeer(HOST, local ? SENDPORT : RECVPORT, RECVPORT);
     try
     {
@@ -124,11 +124,11 @@ public class ComRefBox
       e.printStackTrace();
     }
 
-    peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
-    //peerPublic.<OrderInfo>add_message(OrderInfo.class);
+    //peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
+    peerPublic.<OrderInfo>add_message(OrderInfo.class);
     peerPublic.<GameState>add_message(GameState.class);
     //peerPublic.<VersionInfo>add_message(VersionInfo.class);
-    //peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
+    peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
     //peerPublic.<MachineInfo>add_message(MachineInfo.class);
     //peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
     //peerPublic.<RobotInfo>add_message(RobotInfo.class);
@@ -220,7 +220,7 @@ public class ComRefBox
       {
         try
         {
-          Thread.sleep(1500);
+          Thread.sleep(2000);
         } catch (InterruptedException e)
         {
           e.printStackTrace();
@@ -235,7 +235,6 @@ public class ComRefBox
         long nsec = ns - (ms * 1000000L);
 
         Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
-        Pose2D pos = Pose2D.newBuilder().setX(100).setY(100).setOri(0).setTimestamp(t).build();
         BeaconSignal bs = BeaconSignal.newBuilder().
           setTime(t).
           setSeq(1).
@@ -243,15 +242,14 @@ public class ComRefBox
           setPeerName(ROBOT_NAME).
           setTeamName(TEAM_NAME).
           setTeamColor(TEAM_COLOR).
-          //setPose(pos).
           build();
 
         ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
 
-        /*if (crypto_setup)
+        if (crypto_setup)
         {
           peerPrivate.enqueue(msg);
-        } else*/
+        } else
         {
           peerPublic.enqueue(msg);
         }
@@ -361,16 +359,13 @@ public class ComRefBox
 
               peerPrivate.<BeaconSignal>add_message(BeaconSignal.class);
               peerPrivate.<OrderInfo>add_message(OrderInfo.class);
+              peerPrivate.<GameState>add_message(GameState.class);
+              peerPrivate.<VersionInfo>add_message(VersionInfo.class);
               peerPrivate.<ExplorationInfo>add_message(ExplorationInfo.class);
               peerPrivate.<MachineInfo>add_message(MachineInfo.class);
+              peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
+              peerPrivate.<RobotInfo>add_message(RobotInfo.class);
 
-              //peerPrivate.<GameState>add_message(GameState.class);
-              //peerPrivate.<VersionInfo>add_message(VersionInfo.class);              
-              //peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
-              //peerPrivate.<RobotInfo>add_message(RobotInfo.class);
-              
-              BeaconThread thread = new BeaconThread();
-              thread.start();
               Handler handler = new Handler();
               peerPrivate.register_handler(handler);
             }

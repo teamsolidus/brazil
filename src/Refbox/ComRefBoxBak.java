@@ -109,11 +109,11 @@ public class ComRefBox
 
   public ComRefBox(String ip, int portIn, int portOut) throws AWTException
   {
-    ROBOT_NAME = "Solid3";
+    ROBOT_NAME = "Solid1";
     TEAM_NAME = "Solidus";
     ENCRYPTION_KEY = "randomkey";
     TEAM_COLOR = JobController.TEAM;
-    HOST = "172.26.255.255";
+    HOST = ip;
     local = false;  //if refbox is on same machine
     peerPublic = new ProtobufBroadcastPeer(HOST, local ? SENDPORT : RECVPORT, RECVPORT);
     try
@@ -125,14 +125,16 @@ public class ComRefBox
     }
 
     peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
-    //peerPublic.<OrderInfo>add_message(OrderInfo.class);
+    peerPublic.<OrderInfo>add_message(OrderInfo.class);
     peerPublic.<GameState>add_message(GameState.class);
-    //peerPublic.<VersionInfo>add_message(VersionInfo.class);
-    //peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
-    //peerPublic.<MachineInfo>add_message(MachineInfo.class);
-    //peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
-    //peerPublic.<RobotInfo>add_message(RobotInfo.class);
+    peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
 
+    //peerPublic.<MachineInfo>add_message(MachineInfo.class);
+    //peerPublic.<RoboPos>add_message(RoboPos.class);
+    //wird momentan nicht gebraucht
+    //peerPublic.<VersionInfo>add_message(VersionInfo.class);
+    //peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
+    //peerPublic.<RobotInfo>add_message(RobotInfo.class);   
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
@@ -214,13 +216,15 @@ public class ComRefBox
   private static class BeaconThread extends Thread
   {
 
+    int seq = 1;
+
     public void run()
     {
       while (true)
       {
         try
         {
-          Thread.sleep(1500);
+          Thread.sleep(2000);
         } catch (InterruptedException e)
         {
           e.printStackTrace();
@@ -236,9 +240,10 @@ public class ComRefBox
 
         Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
         Pose2D pos = Pose2D.newBuilder().setX(100).setY(100).setOri(0).setTimestamp(t).build();
+
         BeaconSignal bs = BeaconSignal.newBuilder().
           setTime(t).
-          setSeq(1).
+          setSeq(seq++).
           setNumber(1).
           setPeerName(ROBOT_NAME).
           setTeamName(TEAM_NAME).
@@ -248,10 +253,10 @@ public class ComRefBox
 
         ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
 
-        /*if (crypto_setup)
+        if (crypto_setup)
         {
           peerPrivate.enqueue(msg);
-        } else*/
+        } else
         {
           peerPublic.enqueue(msg);
         }
@@ -318,7 +323,7 @@ public class ComRefBox
         try
         {
           game = GameState.parseFrom(array);
-
+          
           gamePhase = game.getPhase().name();
           gameState = game.getState().name();
 
@@ -361,16 +366,13 @@ public class ComRefBox
 
               peerPrivate.<BeaconSignal>add_message(BeaconSignal.class);
               peerPrivate.<OrderInfo>add_message(OrderInfo.class);
+              peerPrivate.<GameState>add_message(GameState.class);
+              peerPrivate.<VersionInfo>add_message(VersionInfo.class);
               peerPrivate.<ExplorationInfo>add_message(ExplorationInfo.class);
               peerPrivate.<MachineInfo>add_message(MachineInfo.class);
+              peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
+              peerPrivate.<RobotInfo>add_message(RobotInfo.class);
 
-              //peerPrivate.<GameState>add_message(GameState.class);
-              //peerPrivate.<VersionInfo>add_message(VersionInfo.class);              
-              //peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
-              //peerPrivate.<RobotInfo>add_message(RobotInfo.class);
-              
-              BeaconThread thread = new BeaconThread();
-              thread.start();
               Handler handler = new Handler();
               peerPrivate.register_handler(handler);
             }
@@ -409,7 +411,6 @@ public class ComRefBox
             mTypLight[i + 1] = mTypeDef[m][ORANGE];
             mTypLight[i + 2] = mTypeDef[m][GREEN];
             logMessage = "MTyp " + m + " => RED: " + mTypLight[i] + " ORANGE: " + mTypLight[i + 1] + " GREEN: " + mTypLight[i + 2];
-            Main.log.info(logMessage);
             m++;
           }
           exMList = info.getMachinesList();

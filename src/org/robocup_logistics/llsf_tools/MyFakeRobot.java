@@ -56,7 +56,7 @@ public class MyFakeRobot
 
   public static void main(String[] args)
   {
-    ROBOT_NAME = "Solid1";
+    ROBOT_NAME = "Solid3";
     TEAM_NAME = "Solidus";
     ENCRYPTION_KEY = "randomkey";
     TEAM_COLOR = Team.CYAN;
@@ -72,10 +72,10 @@ public class MyFakeRobot
     }
 
     //peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
-    //peerPublic.<OrderInfo>add_message(OrderInfo.class);
-    //peerPublic.<GameState>add_message(GameState.class);
+    peerPublic.<OrderInfo>add_message(OrderInfo.class);
+    peerPublic.<GameState>add_message(GameState.class);
     //peerPublic.<VersionInfo>add_message(VersionInfo.class);
-    //peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
+    peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
     //peerPublic.<MachineInfo>add_message(MachineInfo.class);
     //peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
     //peerPublic.<RobotInfo>add_message(RobotInfo.class);
@@ -83,8 +83,8 @@ public class MyFakeRobot
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
-    BeaconThread thread = new BeaconThread();
-    thread.start();
+    //BeaconThread thread = new BeaconThread();
+    //thread.start();
   }
 
   private static class BeaconThread extends Thread
@@ -135,10 +135,8 @@ public class MyFakeRobot
 
   private static class Handler implements ProtobufMessageHandler
   {
-
     public void handle_message(ByteBuffer in_msg, GeneratedMessage msg)
     {
-
       if (msg instanceof BeaconSignal)
       {
 
