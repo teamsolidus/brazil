@@ -1,10 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * wird momentan nicht eingesetzt --> innere Klasse in ComRefBox
  */
+
 package Refbox;
-// hier ist ein neuer Kommentar
 import MainPack.Main;
 import Sequence.JobController;
 import org.robocup_logistics.llsf_comm.*;
@@ -23,6 +21,7 @@ public class Beacon implements Runnable
   public Beacon(ProtobufBroadcastPeer peer)
   {
     this.peer = peer;
+    new Thread(this).start();
   }
 
   public void run()
@@ -56,7 +55,7 @@ public class Beacon implements Runnable
         build();
 
       ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
-      peer.enqueue(msg); //private
+      peer.enqueue(msg);
     }
   }
 }

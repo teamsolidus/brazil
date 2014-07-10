@@ -13,13 +13,12 @@ import org.robocup_logistics.llsf_msgs.GameStateProtos.GameState;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.Order.DeliveryGate;
 
 /**
- *
- * @author alain controls the states and the phases of the competition is
+ * @author alain 
+ * controls the states and the phases of the competition is
  * responsable for the flow of the game
  */
 public class StateMachine extends Thread
 {
-
     //------> vorläufig manuell anpassen 
     private final String STARTPHI = "E";
     private final int BACKWAY = 240;

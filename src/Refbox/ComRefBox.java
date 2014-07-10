@@ -20,7 +20,6 @@ import org.robocup_logistics.llsf_msgs.MachineInfoProtos.MachineInfo;
 import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReportInfo;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.Order;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.OrderInfo;
-import org.robocup_logistics.llsf_msgs.RobotInfoProtos.RobotInfo;
 import org.robocup_logistics.llsf_msgs.TeamProtos.Team;
 import org.robocup_logistics.llsf_msgs.TimeProtos.Time;
 import org.robocup_logistics.llsf_msgs.VersionProtos.VersionInfo;
@@ -35,19 +34,17 @@ import org.robocup_logistics.llsf_msgs.MachineInfoProtos;
 import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReport;
 import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReportEntry;
 import org.robocup_logistics.llsf_msgs.Pose2DProtos.Pose2D;
-import roboCommunicationTest.RoboComTest;
-import roboCommunicationTest.RoboComTest.RoboPos;
 
 public class ComRefBox
 {
-
+  private static String TEAM_NAME = "Solidus";
+  private static String ENCRYPTION_KEY = "randomkey";
+  private static int JERSEY_NR;
   private static String ROBOT_NAME;
-  private static String TEAM_NAME;
   private static Team TEAM_COLOR;
-  private static String ENCRYPTION_KEY;
-
   private static String HOST;
-  private static boolean local = false;
+
+  private static boolean local = false;           //if refbox is on same machine
 
   private final static int SENDPORT = 4445;
   private final static int RECVPORT = 4444;
@@ -78,7 +75,6 @@ public class ComRefBox
   public static GameState game;              // Game Status
   public static String gamePhase;            // Aktuelle Game Phase (PRE_GAME, EXPLORATION, PRODUCTION, POST_GAME)
   public static String gameState;            // Aktueller Game Status (WAIT_START, RUNNING, PAUSED)
-
   public static String logMessage;           // Logger Meldung für LopPanel
 
   public static int[] mTypLight;             // Lampen Informationen für Maschinentypen
@@ -109,12 +105,11 @@ public class ComRefBox
 
   public ComRefBox(String ip, int portIn, int portOut) throws AWTException
   {
-    ROBOT_NAME = "Solid3";
-    TEAM_NAME = "Solidus";
-    ENCRYPTION_KEY = "randomkey";
+    ROBOT_NAME = Main.name;
     TEAM_COLOR = JobController.TEAM;
-    HOST = "172.26.255.255";
-    local = false;  //if refbox is on same machine
+    JERSEY_NR = Main.getJerseyNr();
+    HOST = ip;
+
     peerPublic = new ProtobufBroadcastPeer(HOST, local ? SENDPORT : RECVPORT, RECVPORT);
     try
     {
@@ -125,19 +120,16 @@ public class ComRefBox
     }
 
     peerPublic.<BeaconSignal>add_message(BeaconSignal.class);
-    //peerPublic.<OrderInfo>add_message(OrderInfo.class);
     peerPublic.<GameState>add_message(GameState.class);
-    //peerPublic.<VersionInfo>add_message(VersionInfo.class);
-    //peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
-    //peerPublic.<MachineInfo>add_message(MachineInfo.class);
-    //peerPublic.<MachineReportInfo>add_message(MachineReportInfo.class);
+    peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
+    peerPublic.<VersionInfo>add_message(VersionInfo.class);
     //peerPublic.<RobotInfo>add_message(RobotInfo.class);
-
+    
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
-    BeaconThread thread = new BeaconThread();
-    thread.start();
+    //BeaconThread thread = new BeaconThread();
+    //thread.start();   
 
     fc = FieldCommander.getInstance();
     jc = JobController.getInstance();
@@ -145,15 +137,7 @@ public class ComRefBox
   }
 
   public void sendMachine(String name, int[] lamp)
-  {
-    try
-    {
-      Thread.sleep(500);
-    } catch (InterruptedException ex)
-    {
-      Main.log.error(ex);
-    }
-
+  {   
     String type = "";
 
     if (lamp[RED] == mTypLight[0] && lamp[ORANGE] == mTypLight[1] && lamp[GREEN] == mTypLight[2])
@@ -178,33 +162,14 @@ public class ComRefBox
     }
     fc.machineMap.get(name).setmTyp(type);// hier wird der jeweilige Maschinentyp in die entsprechende zelle (von der Map geholt) gespeichert
 
-    try
-    {
-      Thread.sleep(1000);
-    } catch (InterruptedException ex)
-    {
-      Main.log.error(ex);
-    }
     MachineReportEntry mi = MachineReportEntry.newBuilder().
       setName(name).
       setType(type).
       build();
     //MachineReport mr = MachineReport.newBuilder().setMachines(1, mi).build();  //for just one Machine
-    MachineReport mr = MachineReport.newBuilder().addMachines(mi).setTeamColor(JobController.TEAM).build();
+    MachineReport mr = MachineReport.newBuilder().addMachines(mi).setTeamColor(JobController.TEAM).build(); //alle bereits erkannte senden(additiv)
     ProtobufMessage machineReport = new ProtobufMessage(2000, 61, mr);
-    peerPublic.enqueue(machineReport);
-  }
-
-  public void sendRoboMsg(boolean takePuck, int id, int x)
-  {
-    RoboComTest.RoboPos rp = RoboComTest.RoboPos.newBuilder().
-      setTakePuck(takePuck).
-      setId(jc.getRoboNameIdx()).
-      setX(x).
-      build();
-
-    ProtobufMessage roboReport = new ProtobufMessage(2000, 61, rp);
-    peerPublic.enqueue(roboReport);
+    peerPrivate.enqueue(machineReport);
   }
 
 //------------------------------------------------------------------------------
@@ -213,14 +178,13 @@ public class ComRefBox
    */
   private static class BeaconThread extends Thread
   {
-
     public void run()
     {
       while (true)
       {
         try
         {
-          Thread.sleep(1500);
+          Thread.sleep(2000);
         } catch (InterruptedException e)
         {
           e.printStackTrace();
@@ -235,15 +199,17 @@ public class ComRefBox
         long nsec = ns - (ms * 1000000L);
 
         Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
+        //Pose2D pos=fc.getPose2D(JERSEY_NR);
         Pose2D pos = Pose2D.newBuilder().setX(100).setY(100).setOri(0).setTimestamp(t).build();
+
         BeaconSignal bs = BeaconSignal.newBuilder().
           setTime(t).
           setSeq(1).
-          setNumber(1).
+          setNumber(JERSEY_NR).
           setPeerName(ROBOT_NAME).
           setTeamName(TEAM_NAME).
           setTeamColor(TEAM_COLOR).
-          //setPose(pos).
+          setPose(pos).
           build();
 
         ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
@@ -262,7 +228,6 @@ public class ComRefBox
 //------------------------------------------------------------------------------
   private static class Handler implements ProtobufMessageHandler
   {
-
     @Override
     public void handle_message(ByteBuffer in_msg, GeneratedMessage msg)
     {
@@ -278,8 +243,7 @@ public class ComRefBox
         {
           bs = BeaconSignal.parseFrom(array);
           t = bs.getTime();
-          System.out.printf("Detected robot: %d %s:%s (seq %d)\n", bs.getNumber(), bs.getTeamName(), bs.getPeerName(), t.getSec());
-
+          System.out.printf("Detected robot: %d %s:%s (seq %d)- x:%d/y:%d-%d\n", bs.getNumber(), bs.getTeamName(), bs.getPeerName(), t.getSec(),(int)bs.getPose().getX(),(int)bs.getPose().getY(),(int)bs.getPose().getOri());
         } catch (InvalidProtocolBufferException e)
         {
           e.printStackTrace();
@@ -361,16 +325,14 @@ public class ComRefBox
 
               peerPrivate.<BeaconSignal>add_message(BeaconSignal.class);
               peerPrivate.<OrderInfo>add_message(OrderInfo.class);
-              peerPrivate.<ExplorationInfo>add_message(ExplorationInfo.class);
-              peerPrivate.<MachineInfo>add_message(MachineInfo.class);
-
-              //peerPrivate.<GameState>add_message(GameState.class);
-              //peerPrivate.<VersionInfo>add_message(VersionInfo.class);              
-              //peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
-              //peerPrivate.<RobotInfo>add_message(RobotInfo.class);
+              peerPrivate.<MachineInfo>add_message(MachineInfo.class);              
+              
+              //only send
+              peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);              
               
               BeaconThread thread = new BeaconThread();
               thread.start();
+              
               Handler handler = new Handler();
               peerPrivate.register_handler(handler);
             }
@@ -386,7 +348,7 @@ public class ComRefBox
         in_msg.rewind();
         in_msg.get(array);
         ExplorationInfo info;
-
+        System.out.println("Exploration info received:");
         try
         {
           info = ExplorationInfo.parseFrom(array);
@@ -437,23 +399,7 @@ public class ComRefBox
         {
           Main.log.error(ex);
         }
-      } //-----------ROBO COM TEST--------------------------------
-      else if (msg instanceof RoboPos)
-      {
-        byte[] array = new byte[in_msg.capacity()];
-        in_msg.rewind();
-        in_msg.get(array);
-
-        try
-        {
-          RoboPos pos = RoboPos.parseFrom(array);
-          //setChanged();
-          //notifyObservers(send);
-        } catch (InvalidProtocolBufferException ex)
-        {
-          Main.log.error(ex);
-        }
-      }
+      } 
     }
 
     public void connection_lost(IOException e)
@@ -463,6 +409,7 @@ public class ComRefBox
 
     public void timeout()
     {
+      System.out.println("timeout");
     }
   }
 

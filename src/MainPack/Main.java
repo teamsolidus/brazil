@@ -32,6 +32,7 @@ public class Main
   public static String refBoxPortIn = "4444";
   public static String refBoxPortOut = "4444";
   public static String name = "Solid1";
+
   static ComRefBox comRefBox;
   static ComView comView;
   static JobController jc;
@@ -116,6 +117,11 @@ public class Main
     schreiber.flush();
   }
 
+  public static String getName()
+  {
+    return name;
+  }
+
   public static void setPortRefbox(String port) throws FileNotFoundException, IOException
   {
     refBoxPortIn = port;
@@ -133,8 +139,6 @@ public class Main
 
     sm = new StateMachine(comRefBox, jc);
 
-// Start Robotinos
-    //robo.start();
     comView.start();
     Thread.sleep(1000);
     sm.start();
