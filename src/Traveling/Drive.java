@@ -104,6 +104,9 @@ public class Drive extends Thread
                 }
 
             }
+          
+            
+           // fc.setRoboPos(Main.getJerseyNr(),xAbsolut, yAbsolut, 1);
 
             if ((avoid || fc.avoidTest) && !avoidStart)
             {
