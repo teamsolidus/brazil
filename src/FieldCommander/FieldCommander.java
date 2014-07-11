@@ -4,6 +4,7 @@ import ComView.ComView;
 import GUI.RefboxPanel;
 import MainPack.Main;
 import MainPack.Start;
+import Refbox.ComRefBox;
 import Sequence.StateMachine;
 import Tools.PingRefbox;
 import Traveling.Drive;
@@ -35,7 +36,8 @@ public class FieldCommander extends Frame implements MouseListener
   PingRefbox pingRb;
   ComView comView;
   Button startView, restartView, start, avoid, maint, test;
-
+  ComRefBox cRB;
+  
   public static final int NORTH = 0;
   public static final int EAST = 90;
   public static final int SOUTH = 180;
@@ -55,6 +57,7 @@ public class FieldCommander extends Frame implements MouseListener
       0, 0, 0
     }
   };
+  
   public Cell[][] cell = new Cell[20][9];                 //Field Array for Coord-Access
   public Map<String, Cell> machineMap = new HashMap();    //Map for Machine-ID-Access
 
@@ -80,7 +83,6 @@ public class FieldCommander extends Frame implements MouseListener
 
   private FieldCommander() throws AWTException
   {
-
     startUpView = new Start();
     comView = ComView.getInstance();
 
@@ -88,7 +90,7 @@ public class FieldCommander extends Frame implements MouseListener
     initFieldGraphic();
 
     refbox = new RefboxPanel();
-    refbox.setBounds(750, 700, 400, 80);
+    refbox.setBounds(50, 700, 300, 80);
     this.add(refbox);
 
     start = new Button();
@@ -111,7 +113,7 @@ public class FieldCommander extends Frame implements MouseListener
     restartView.setBackground(Color.PINK);
     restartView.setLabel("RESTART VIEW");
     restartView.setSize(150, 50);
-    restartView.setLocation(450, 625);
+    restartView.setLocation(445, 625);
     this.add(restartView);
     restartView.addMouseListener(this);
 
@@ -119,7 +121,7 @@ public class FieldCommander extends Frame implements MouseListener
     avoid.setBackground(Color.PINK);
     avoid.setLabel("AVOID TEST SIGNAL");
     avoid.setSize(150, 50);
-    avoid.setLocation(650, 625);
+    avoid.setLocation(640, 625);
     this.add(avoid);
     avoid.addMouseListener(this);
 
@@ -127,7 +129,7 @@ public class FieldCommander extends Frame implements MouseListener
     maint.setBackground(Color.PINK);
     maint.setLabel("MAINTENANCE");
     maint.setSize(150, 50);
-    maint.setLocation(850, 625);
+    maint.setLocation(835, 625);
     this.add(maint);
     maint.addMouseListener(this);
 
@@ -143,7 +145,7 @@ public class FieldCommander extends Frame implements MouseListener
   public void initFieldGraphic()
   {
     this.setLayout(null);
-    this.setSize(1250, 1000);
+    this.setSize(1220, 800);
     this.addWindowListener(new WindowAdapter()
     {
       @Override
@@ -291,6 +293,11 @@ public class FieldCommander extends Frame implements MouseListener
     cell[x][y].setFree(free);
     cell[x][y].setDirection(dir);
   }
+  
+  public void setComRefBox(ComRefBox cRB)
+  {
+    this.cRB=cRB;
+  }
 
   public void paint(Graphics g)
   {
@@ -399,7 +406,9 @@ public class FieldCommander extends Frame implements MouseListener
       maintenance = true;
     } else if (e.getSource() == test)
     {
-        this.setRoboPos(1,25,25,1);     
+      //this.setRoboPos(Main.getJerseyNr(), 25, 25, 1);  //Test Position fow Own Robot
+      int[] lamp={1,1,1};
+      cRB.sendMachine("M1", lamp);
     }
   }
 

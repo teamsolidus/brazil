@@ -93,9 +93,10 @@ public class Main
       jc.setRoboNameIdx(read.getText(namefile));
       fc.refbox.roboname.setText(name);
       comRefBox = new ComRefBox(refBoxIp, 4444, 4444);
-
+      fc.setComRefBox(comRefBox);
     } catch (IOException ex)
     {
+      System.out.println("File(s) not found !!!");
     }
   }
 // ----------------------------------------------------------------------------- 

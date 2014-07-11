@@ -4,9 +4,13 @@ import ComView.FileIO;
 import FieldCommander.FieldCommander;
 import MainPack.Main;
 import Sequence.JobController;
+import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.InvalidProtocolBufferException;
+import java.awt.AWTException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
+import java.util.List;
 import org.robocup_logistics.llsf_comm.ProtobufBroadcastPeer;
 import org.robocup_logistics.llsf_comm.ProtobufMessage;
 import org.robocup_logistics.llsf_comm.ProtobufMessageHandler;
@@ -15,25 +19,20 @@ import org.robocup_logistics.llsf_msgs.ExplorationInfoProtos.ExplorationInfo;
 import org.robocup_logistics.llsf_msgs.ExplorationInfoProtos.ExplorationMachine;
 import org.robocup_logistics.llsf_msgs.ExplorationInfoProtos.ExplorationSignal;
 import org.robocup_logistics.llsf_msgs.GameStateProtos.GameState;
+import org.robocup_logistics.llsf_msgs.MachineInfoProtos;
 import org.robocup_logistics.llsf_msgs.MachineInfoProtos.Machine;
 import org.robocup_logistics.llsf_msgs.MachineInfoProtos.MachineInfo;
+import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReport;
+import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReportEntry;
 import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReportInfo;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.Order;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.OrderInfo;
+import org.robocup_logistics.llsf_msgs.Pose2DProtos.Pose2D;
+import org.robocup_logistics.llsf_msgs.RobotInfoProtos.RobotInfo;
 import org.robocup_logistics.llsf_msgs.TeamProtos.Team;
 import org.robocup_logistics.llsf_msgs.TimeProtos.Time;
 import org.robocup_logistics.llsf_msgs.VersionProtos.VersionInfo;
 import org.robocup_logistics.llsf_utils.NanoSecondsTimestampProvider;
-
-import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.InvalidProtocolBufferException;
-import java.awt.AWTException;
-import java.io.File;
-import java.util.List;
-import org.robocup_logistics.llsf_msgs.MachineInfoProtos;
-import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReport;
-import org.robocup_logistics.llsf_msgs.MachineReportProtos.MachineReportEntry;
-import org.robocup_logistics.llsf_msgs.Pose2DProtos.Pose2D;
 
 public class ComRefBox
 {
@@ -56,8 +55,8 @@ public class ComRefBox
   private final static int MAGENTA_RECVPORT = 4442;
 
 // ---------------------------- Verbindung -------------------------------------
-  private static ProtobufBroadcastPeer peerPublic;
-  private static ProtobufBroadcastPeer peerPrivate;
+  private static ProtobufBroadcastPeer peerPublic;   //open public channel for all
+  private static ProtobufBroadcastPeer peerPrivate;  //private encrypted channel for team
 
   private static boolean crypto_setup = false;
 
@@ -107,7 +106,7 @@ public class ComRefBox
   {
     ROBOT_NAME = Main.name;
     TEAM_COLOR = JobController.TEAM;
-    ENCRYPTION_KEY=Main.encKey;
+    ENCRYPTION_KEY = Main.encKey;
     JERSEY_NR = Main.getJerseyNr();
     HOST = ip;
 
@@ -124,13 +123,13 @@ public class ComRefBox
     peerPublic.<GameState>add_message(GameState.class);
     peerPublic.<ExplorationInfo>add_message(ExplorationInfo.class);
     peerPublic.<VersionInfo>add_message(VersionInfo.class);
-    //peerPublic.<RobotInfo>add_message(RobotInfo.class);
+    peerPublic.<RobotInfo>add_message(RobotInfo.class);
 
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
     BeaconThread thread = new BeaconThread();
-    thread.start();   
+    thread.start();
     fc = FieldCommander.getInstance();
     jc = JobController.getInstance();
     jc.registerComRefBox(this);
@@ -169,7 +168,8 @@ public class ComRefBox
     //MachineReport mr = MachineReport.newBuilder().setMachines(1, mi).build();  //for just one Machine
     MachineReport mr = MachineReport.newBuilder().addMachines(mi).setTeamColor(JobController.TEAM).build(); //alle bereits erkannte senden(additiv)
     ProtobufMessage machineReport = new ProtobufMessage(2000, 61, mr);
-    peerPrivate.enqueue(machineReport);
+    //peerPrivate.enqueue(machineReport);  //eigentlich sollte diese Meldung über private, kommt aber auf der momentanen Refbox-Version nicht an.
+    peerPublic.enqueue(machineReport);
   }
 
 //------------------------------------------------------------------------------
@@ -215,10 +215,11 @@ public class ComRefBox
 
         ProtobufMessage msg = new ProtobufMessage(2000, 1, bs);
 
-        /*if (crypto_setup)
-         {
-         peerPrivate.enqueue(msg);
-         } else*/
+        /*if (crypto_setup)   
+        {
+          peerPrivate.enqueue(msg);  //eigentlich sollte diese Meldung über private, kommt aber auf der momentanen Refbox-Version nicht an.
+        } else
+        */  
         {
           peerPublic.enqueue(msg);
         }
@@ -245,7 +246,7 @@ public class ComRefBox
           bs = BeaconSignal.parseFrom(array);
           t = bs.getTime();
           System.out.printf("Detected robot: %d %s:%s (seq %d)- x:%d/y:%d-%d\n", bs.getNumber(), bs.getTeamName(), bs.getPeerName(), t.getSec(), (int) bs.getPose().getX(), (int) bs.getPose().getY(), (int) bs.getPose().getOri());
-          if (bs.getNumber() != JERSEY_NR && bs.getNumber()>0)
+          if (bs.getNumber() != JERSEY_NR && bs.getNumber() > 0)
           {
             fc.setRoboPos(bs.getNumber(), (int) bs.getPose().getX(), (int) bs.getPose().getY(), (int) bs.getPose().getOri());
           }
@@ -333,11 +334,8 @@ public class ComRefBox
               peerPrivate.<MachineInfo>add_message(MachineInfo.class);
 
               //only send
-              peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
-
-              //BeaconThread thread = new BeaconThread();
-              //thread.start();
-
+              peerPrivate.<MachineReport>add_message(MachineReport.class);
+          
               Handler handler = new Handler();
               peerPrivate.register_handler(handler);
             }
@@ -422,24 +420,11 @@ public class ComRefBox
   {
     int refBoxPortIn = 4444;
     int refBoxPortOut = 4444;
-    String name;
-
-    File ipfile;
-    File namefile;
-
+    String ip="172.26.255.255";
+    
     try
-    {
-      ipfile = new File("C:/Robotino/iprefbox");
-      namefile = new File("C:/Robotino/name");
-
-      FileIO read = new FileIO();
-      read.getText(ipfile);
-      read.getText(namefile);
-
-      String refBoxIp = read.getText(ipfile);
-      name = read.getText(namefile);
-
-      ComRefBox comRefBox = new ComRefBox(refBoxIp, refBoxPortIn, refBoxPortOut);
+    {          
+      ComRefBox comRefBox = new ComRefBox(ip,refBoxPortIn,refBoxPortOut);
       //Thread.sleep(5000);
       //comRefBox.sendRoboMsg(true,111,222);
     } catch (Exception ex)
