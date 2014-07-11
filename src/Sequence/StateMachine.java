@@ -13,13 +13,12 @@ import org.robocup_logistics.llsf_msgs.GameStateProtos.GameState;
 import org.robocup_logistics.llsf_msgs.OrderInfoProtos.Order.DeliveryGate;
 
 /**
- * @author alain 
- * controls the states and the phases of the competition is
+ * @author alain controls the states and the phases of the competition is
  * responsable for the flow of the game
  */
-public class StateMachine extends Thread
-{
+public class StateMachine extends Thread {
     //------> vorläufig manuell anpassen 
+
     private final String STARTPHI = "E";
     private final int BACKWAY = 240;
     private static StateMachine instance = null;
@@ -341,16 +340,14 @@ public class StateMachine extends Thread
                     BrownT5 = way.getProdMachine("T5", 1);
                     Main.log.debug("************* STEP START_ROBO_3_IN_PRODUCTION *****************");
 
-                    drive.setStartCell(2, 1);
-                    drive.setStartPosPhi(180);
+                    //drive.setStartCell(2, 1);               //Test
+                    //drive.setStartPosPhi(180);              //Test
 
 
                     /* drive.goStart(way.getStartKoordX(), way.getStartKoordY(), STARTPHI);
                      drive.setStartPosPhi(180);*/
                     //******************ACHTUNG: Methode für ins Feld hineinfahren noch nicht implementiert
                     prodStep = "TO_PUCK_AREA";
-
-//                  
                     break;
 
                 case "TO_PUCK_AREA":
@@ -380,9 +377,9 @@ public class StateMachine extends Thread
                 case "TO_T5":
                     Main.log.debug("************* STEP TO_T5" + way.getLoadCellNearMachine(BrownT5) + " *****************");
                     comView.setStation(0);
-                    
-                    //   drive.setEndTarget(way.getLoadCellNearMachine(BrownT5));
-                    drive.setEndTarget(way.getLoadCellNearMachine("M9"));
+
+                    drive.setEndTarget(way.getLoadCellNearMachine(BrownT5));
+
                     drive.takeNext = true;
                     prodStep = "WAIT_DRIVE";
                     break;
@@ -419,16 +416,15 @@ public class StateMachine extends Thread
                     comView.setKoords(BACKWAY, 150, 0);
                     nextStep = "TO_WAIT_CELL";
                     prodStep = "WAIT_ROBOVIEW";
+                    drive.setStartPosPhi(way.getDirectionOfMachine(BrownT5));
                     break;
 
                 case "TO_WAIT_CELL":
                     Main.log.debug("************* STEP TO_WAIT_CELL (1,1) *****************");
-                    drive.setStartPosPhi(way.getDirectionOfMachine("M9"));
                     drive.setEndTarget(1, 1);
                     //drive.setEndTarget(way.getWaitCellBrown());
                     drive.takeNext = true;
                     prodStep = "WAIT_DRIVE";
-
                     break;
 
                 case "TO_DELIVERY":
@@ -660,7 +656,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T1" + way.getLoadCellNearMachine(PinkT1) + " *****************");
                         comView.setStation(0);
-                        
+
                         drive.setEndTarget(way.getLoadCellNearMachine(PinkT1));
 
                         drive.takeNext = true;
@@ -669,7 +665,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T1" + way.getLoadCellNearMachine(BlondT1) + " *****************");
                         comView.setStation(0);
-                        
+
                         drive.setEndTarget(way.getLoadCellNearMachine(BlondT1));
 
                         drive.takeNext = true;
@@ -682,7 +678,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T2" + way.getLoadCellNearMachine(PinkT2) + " *****************");
                         comView.setStation(0);
-                        
+
                         drive.setEndTarget(way.getLoadCellNearMachine(PinkT2));
 
                         drive.takeNext = true;
@@ -691,7 +687,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T2" + way.getLoadCellNearMachine(BlondT2) + " *****************");
                         comView.setStation(0);
-                        
+
                         drive.setEndTarget(way.getLoadCellNearMachine(BlondT2));
 
                         drive.takeNext = true;
@@ -704,7 +700,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T3" + way.getLoadCellNearMachine(PinkT3) + " *****************");
                         comView.setStation(0);
-                        
+
                         drive.setEndTarget(way.getLoadCellNearMachine(PinkT3));
 
                         drive.takeNext = true;
@@ -713,7 +709,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T4" + way.getLoadCellNearMachine(BlondT4) + " *****************");
                         comView.setStation(0);
-                        
+
                         drive.setEndTarget(way.getLoadCellNearMachine(BlondT4));
 
                         drive.takeNext = true;
@@ -723,7 +719,7 @@ public class StateMachine extends Thread
                 case "TO_WAITING_CELL_PINK":
                     Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                     comView.setStation(0);
-                    
+
                     drive.setEndTarget(way.getWaitCellPink());
 
                     drive.takeNext = true;
@@ -733,7 +729,7 @@ public class StateMachine extends Thread
                 case "TO_WAITING_CELL_BLOND":
                     Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                     comView.setStation(0);
-                    
+
                     drive.setEndTarget(way.getWaitCellBlond());
 
                     drive.takeNext = true;
@@ -835,12 +831,9 @@ public class StateMachine extends Thread
                         case 5:
                             nextStep = "TO_T2";
                             prodStep = "WAIT_ROBOVIEW";
-                            if (way.getRoboNameIdx() == 1)
-                            {
-                            drive.setStartPosPhi(way.getDirectionOfMachine(PinkT1));
-                            }
-                            else
-                            {
+                            if (way.getRoboNameIdx() == 1) {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(PinkT1));
+                            } else {
                                 drive.setStartPosPhi(way.getDirectionOfMachine(BlondT1));
                             }
                             break;
@@ -859,29 +852,23 @@ public class StateMachine extends Thread
                         case 11:
                             nextStep = "TO_T3/4";
                             prodStep = "WAIT_ROBOVIEW";
-                            if (way.getRoboNameIdx() == 1)
-                            {
+                            if (way.getRoboNameIdx() == 1) {
                                 drive.setStartPosPhi(way.getDirectionOfMachine(PinkT2));
-                            }
-                            else
-                            {
+                            } else {
                                 drive.setStartPosPhi(way.getDirectionOfMachine(BlondT2));
                             }
                             break;
                         case 13:
                             nextStep = "TO_T3/4";
                             prodStep = "WAIT_ROBOVIEW";
-                            if (way.getRoboNameIdx() == 1)
-                            {
+                            if (way.getRoboNameIdx() == 1) {
                                 drive.setStartPosPhi(way.getDirectionOfMachine(PinkT1));
-                            }
-                            else
-                            {
+                            } else {
                                 drive.setStartPosPhi(way.getDirectionOfMachine(BlondT1));
                             }
                             break;
                     }
-                    
+
                     break;
 
                 case "MOVE_LEFT_SIDE_A":
