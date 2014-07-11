@@ -556,7 +556,7 @@ public class JobController implements Serializable
 
   public int getRoboNameIdx()
   {
-    return roboNameIdx;
+    return roboNameIdx + 1;
   }
 
   public void setRoboNameIdx(int roboNameIdx)
