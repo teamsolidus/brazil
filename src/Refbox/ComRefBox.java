@@ -38,7 +38,7 @@ import org.robocup_logistics.llsf_msgs.Pose2DProtos.Pose2D;
 public class ComRefBox
 {
   private static String TEAM_NAME = "Solidus";
-  private static String ENCRYPTION_KEY = "randomkey";
+  private static String ENCRYPTION_KEY = "random";
   private static int JERSEY_NR;
   private static String ROBOT_NAME;
   private static Team TEAM_COLOR;
@@ -129,8 +129,8 @@ public class ComRefBox
     Handler handler = new Handler();
     peerPublic.register_handler(handler);
 
-    //BeaconThread thread = new BeaconThread();
-    //thread.start();   
+    BeaconThread thread = new BeaconThread();
+    thread.start();   
     fc = FieldCommander.getInstance();
     jc = JobController.getInstance();
     jc.registerComRefBox(this);
@@ -335,8 +335,8 @@ public class ComRefBox
               //only send
               peerPrivate.<MachineReportInfo>add_message(MachineReportInfo.class);
 
-              BeaconThread thread = new BeaconThread();
-              thread.start();
+              //BeaconThread thread = new BeaconThread();
+              //thread.start();
 
               Handler handler = new Handler();
               peerPrivate.register_handler(handler);
