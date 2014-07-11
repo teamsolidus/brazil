@@ -34,7 +34,7 @@ public class FieldCommander extends Frame implements MouseListener
   Start startUpView;
   PingRefbox pingRb;
   ComView comView;
-  Button startView, restartView, start, avoid, maint;
+  Button startView, restartView, start, avoid, maint, test;
 
   public static final int NORTH = 0;
   public static final int EAST = 90;
@@ -47,10 +47,10 @@ public class FieldCommander extends Frame implements MouseListener
   {
     {
       0, 0, 0   //x,y,onPuckStation
-    }, 
+    },
     {
       0, 0, 0
-    }, 
+    },
     {
       0, 0, 0
     }
@@ -71,7 +71,6 @@ public class FieldCommander extends Frame implements MouseListener
    */
   public static FieldCommander getInstance() throws AWTException
   {
-
     if (instance == null)
     {
       instance = new FieldCommander();
@@ -89,8 +88,7 @@ public class FieldCommander extends Frame implements MouseListener
     initFieldGraphic();
 
     refbox = new RefboxPanel();
-    refbox.setSize(600, 300);
-    refbox.setLocation(200, 625);
+    refbox.setBounds(750, 700, 400, 80);
     this.add(refbox);
 
     start = new Button();
@@ -105,7 +103,7 @@ public class FieldCommander extends Frame implements MouseListener
     startView.setBackground(Color.PINK);
     startView.setLabel("START VIEW");
     startView.setSize(150, 50);
-    startView.setLocation(50, 700);
+    startView.setLocation(250, 625);
     this.add(startView);
     startView.addMouseListener(this);
 
@@ -113,7 +111,7 @@ public class FieldCommander extends Frame implements MouseListener
     restartView.setBackground(Color.PINK);
     restartView.setLabel("RESTART VIEW");
     restartView.setSize(150, 50);
-    restartView.setLocation(50, 775);
+    restartView.setLocation(450, 625);
     this.add(restartView);
     restartView.addMouseListener(this);
 
@@ -121,7 +119,7 @@ public class FieldCommander extends Frame implements MouseListener
     avoid.setBackground(Color.PINK);
     avoid.setLabel("AVOID TEST SIGNAL");
     avoid.setSize(150, 50);
-    avoid.setLocation(50, 850);
+    avoid.setLocation(650, 625);
     this.add(avoid);
     avoid.addMouseListener(this);
 
@@ -129,10 +127,17 @@ public class FieldCommander extends Frame implements MouseListener
     maint.setBackground(Color.PINK);
     maint.setLabel("MAINTENANCE");
     maint.setSize(150, 50);
-    maint.setLocation(50, 925);
+    maint.setLocation(850, 625);
     this.add(maint);
     maint.addMouseListener(this);
 
+    test = new Button();
+    test.setBackground(Color.PINK);
+    test.setLabel("TEST");
+    test.setSize(150, 50);
+    test.setLocation(1025, 625);
+    this.add(test);
+    test.addMouseListener(this);
   }
 
   public void initFieldGraphic()
@@ -149,18 +154,18 @@ public class FieldCommander extends Frame implements MouseListener
     });
   }
 
-  public void setRoboPos(int nr,int x, int y, int puck)
+  public void setRoboPos(int nr, int x, int y, int puck)
   {
-    roboPos[nr-1][0]=x;
-    roboPos[nr-1][1]=y;
-    roboPos[nr-1][2]=puck;
-  }  
-  
+    roboPos[nr - 1][0] = x;
+    roboPos[nr - 1][1] = y;
+    roboPos[nr - 1][2] = puck;
+  }
+
   public int[] getRoboPos(int nr)
   {
-    return roboPos[nr-1];
+    return roboPos[nr - 1];
   }
-  
+
   public void initFieldModel()
   {
     //<editor-fold defaultstate="collapsed" desc="free cell definitions">
@@ -170,7 +175,7 @@ public class FieldCommander extends Frame implements MouseListener
       {
         cell[countx][county] = new Cell(countx, county);
         cell[countx][county].setLayout(null);
-                // cell[countx][county].setX(x);
+        // cell[countx][county].setX(x);
         // cell[countx][county].setY(y);
         cell[countx][county].setRealX(-(x + 25 - startx) * 10); // effektiver x wert setzten
         cell[countx][county].setRealY((y + 25 - starty) * 10); // effektiver y wert setzen
@@ -332,12 +337,12 @@ public class FieldCommander extends Frame implements MouseListener
 
     f.setVisible(true);
 
-        //  System.out.println(f.machineMap.get("D1").getX());
+    //  System.out.println(f.machineMap.get("D1").getX());
     // System.out.println(f.machineMap.get("D1").getY());
 // hier kann die Mittelpunktkoordianten des Panels abgefragt werden ( evtl brauchen wir noch eine Variable mehr mit dem Effektivwert )
     System.out.println(f.cell[17][1].getRealX());
     System.out.println(f.cell[17][1].getRealY());
-        // System.out.println(f.cell[0][0].getRealY());
+    // System.out.println(f.cell[0][0].getRealY());
     //System.out.println(f.cell[0][0].getRealX());
 
     f.cell[1][1].setRoute(true);
@@ -348,7 +353,6 @@ public class FieldCommander extends Frame implements MouseListener
   @Override
   public void mouseClicked(MouseEvent e)
   {
-
     if (e.getSource() == startView)
     {
       try
@@ -358,9 +362,7 @@ public class FieldCommander extends Frame implements MouseListener
       {
         Logger.getLogger(FieldCommander.class.getName()).log(Level.SEVERE, null, ex);
       }
-    }
-
-    if (e.getSource() == restartView)
+    } else if (e.getSource() == restartView)
     {
       try
       {
@@ -369,24 +371,16 @@ public class FieldCommander extends Frame implements MouseListener
       {
         Logger.getLogger(FieldCommander.class.getName()).log(Level.SEVERE, null, ex);
       }
-
-    }
-
-    if (e.getSource() == start)
+    } else if (e.getSource() == start)
     {
       try
       {
         Main.startServer();
-
       } catch (InterruptedException | IOException | AWTException ex)
       {
-
       }
-    }
-
-    if (e.getSource() == avoid)
+    } else if (e.getSource() == avoid)
     {
-
       for (int i = 100; i >= 0; i = i - 10)
       {
         comView.breakingFactor = i;
@@ -398,41 +392,34 @@ public class FieldCommander extends Frame implements MouseListener
           Logger.getLogger(FieldCommander.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
-            // abbremsen und danach das ausweichen auslösen
-
+      // abbremsen und danach das ausweichen auslösen
       avoidTest = true;
-    }
-
-    if (e.getSource() == maint)
+    } else if (e.getSource() == maint)
     {
-
       maintenance = true;
-
+    } else if (e.getSource() == test)
+    {
+        this.setRoboPos(1,25,25,1);     
     }
-
   }
 
   @Override
   public void mousePressed(MouseEvent e)
   {
-
   }
 
   @Override
   public void mouseReleased(MouseEvent e)
   {
-
   }
 
   @Override
   public void mouseEntered(MouseEvent e)
   {
-
   }
 
   @Override
   public void mouseExited(MouseEvent e)
   {
-
   }
 }

@@ -8,7 +8,6 @@
  */
 package GUI;
 
-import FieldCommander.FieldCommander;
 import MainPack.Main;
 import Tools.PingRefbox;
 import java.awt.*;
@@ -17,10 +16,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.BoxLayout;
 
 /**
  *
@@ -28,42 +24,42 @@ import javax.swing.JTextField;
  */
 public class RefboxPanel extends Panel implements MouseListener
 {
-
     Label ipLabel = new Label("Refbox IP:");
-    Label portLabel = new Label("Refbox Port:");
+    Label keyLabel = new Label("Encryption Key:");
     Label nameLabel = new Label("Robotino Name:");
 
     TextField ip = new TextField();
-    TextField port = new TextField();
+    TextField encKey = new TextField();
     public TextField roboname = new TextField();
 
     Button ping = new Button();
-    Button ok = new Button();
+    Button test=new Button();
+    Button ok = new Button();       
 
     PingRefbox pingRb = new PingRefbox();
 
     public RefboxPanel()
     {
-
-        setLayout(null);
+        this.setBackground(new Color(100,100,240));
+        setLayout(new GridLayout(3, 3, 5, 5));
 
         ip.setText(Main.refBoxIp);
         ip.setLocation(200, 100);
         ip.setSize(180, 40);
         ip.setBackground(Color.GREEN);
 
-        port.setText(Main.refBoxPortIn + "");
-        port.setLocation(200, 150);
-        port.setSize(180, 40);
-        port.setBackground(Color.GREEN);
+        encKey.setText(Main.encKey + "");
+        encKey.setLocation(200, 150);
+        encKey.setSize(180, 30);
+        encKey.setBackground(Color.GREEN);
 
         roboname.setText(Main.name);
         roboname.setLocation(200, 200);
-        roboname.setSize(180, 40);
+        roboname.setSize(180, 30);
         roboname.setBackground(Color.GREEN);
 
-        portLabel.setSize(100, 45);
-        portLabel.setLocation(100, 150);
+        keyLabel.setSize(100, 40);
+        keyLabel.setLocation(100, 150);
 
         nameLabel.setSize(100, 45);
         nameLabel.setLocation(100, 200);
@@ -79,18 +75,19 @@ public class RefboxPanel extends Panel implements MouseListener
         ping.setBackground(Color.PINK);
         ping.setLabel("PING REFBOX");
         ping.setSize(100, 50);
-        ping.setLocation(400, 90);
-        this.add(ping);
+        ping.setLocation(400, 90);       
         ping.addMouseListener(this);
-
-        add(roboname);
-        add(nameLabel);
-        add(port);
-        add(portLabel);
+        
         add(ipLabel);
-        add(ip);
-        add(ok);
-
+        add(ip);                
+        add(ping);
+        add(nameLabel);
+        add(roboname);   
+        add(test);
+        add(keyLabel);        
+        add(encKey);        
+        add(ok);                
+        setSize(200,100);
     }
 
     @Override
@@ -121,8 +118,9 @@ public class RefboxPanel extends Panel implements MouseListener
                     {
                         Main.setIpRefbox(ip.getText());
                         Main.setNameRobo(roboname.getText());
+                        Main.setEncryptionKey(encKey.getText());
 
-                        System.out.println("Refbox-IP wurde auf " + Main.refBoxIp + ":" + Main.refBoxPortIn + " geändert!");
+                        System.out.println("Refbox-IP wurde auf " + Main.refBoxIp + ":" + Main.encKey + " geändert!");
                     } catch (IOException ex)
                     {
                     }

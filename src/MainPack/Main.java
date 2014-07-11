@@ -29,9 +29,8 @@ public class Main
   public static org.apache.log4j.Logger log = org.apache.log4j.Logger.getRootLogger();
 
   public static String refBoxIp = "172.26.255.255";
-  public static String refBoxPortIn = "4444";
-  public static String refBoxPortOut = "4444";
   public static String name = "Solid1";
+  public static String encKey = "randomkey";
 
   static ComRefBox comRefBox;
   static ComView comView;
@@ -39,7 +38,7 @@ public class Main
   static StateMachine sm;
   static FieldCommander fc;
   static File ipfile;
-  static File portfile;
+  static File encfile;
   static File namefile;
   static String relativ;
   public static int jerseyNr;
@@ -82,17 +81,18 @@ public class Main
     {
       ipfile = new File("C:/Robotino/iprefbox");
       namefile = new File("C:/Robotino/name");
-
-      FileIO read = new FileIO();
-      read.getText(ipfile);
-      read.getText(namefile);
-
+      encfile = new File("C:/Robotino/encfile");
+      
+      FileIO read = new FileIO();           
+      
       refBoxIp = read.getText(ipfile);
       name = read.getText(namefile);
+      encKey=read.getText(encfile);
+      
       jerseyNr = getJerseyNr();
       jc.setRoboNameIdx(read.getText(namefile));
       fc.refbox.roboname.setText(name);
-      comRefBox = new ComRefBox(refBoxIp, Integer.valueOf(refBoxPortIn), Integer.valueOf(refBoxPortOut));
+      comRefBox = new ComRefBox(refBoxIp, 4444, 4444);
 
     } catch (IOException ex)
     {
@@ -122,12 +122,12 @@ public class Main
     return name;
   }
 
-  public static void setPortRefbox(String port) throws FileNotFoundException, IOException
+  public static void setEncryptionKey(String key) throws FileNotFoundException, IOException
   {
-    refBoxPortIn = port;
-    System.out.println(port);
-    FileWriter schreiber = new FileWriter(portfile);
-    schreiber.write(port);
+    encKey = key;
+    System.out.println(encfile);
+    FileWriter schreiber = new FileWriter(encfile);
+    schreiber.write(encKey);
     schreiber.flush();
     schreiber.close();
   }
