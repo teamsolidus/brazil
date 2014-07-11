@@ -51,14 +51,12 @@ public class StateMachine extends Thread
     String nextStep;
     Maintenance mtc;
 
-    public static StateMachine getInstance()
-    {
+    public static StateMachine getInstance() {
         return instance;
     }
 
     // Lampen Farben der Maschinen in der Explorationsphase
-    public StateMachine(ComRefBox handler, JobController way) throws InterruptedException, AWTException
-    {
+    public StateMachine(ComRefBox handler, JobController way) throws InterruptedException, AWTException {
         this.comRefBox = handler;
         comView = ComView.getInstance();
         fc = FieldCommander.getInstance();
@@ -70,30 +68,24 @@ public class StateMachine extends Thread
         drive = Drive.getInstance();
     }
 
-    public void setRunning(boolean running)
-    {
+    public void setRunning(boolean running) {
         this.running = running;
     }
 
     @Override
-    public void run()
-    {
-        while (running)
-        {
+    public void run() {
+        while (running) {
             GameState game = ComRefBox.game;
             state = comRefBox.gameState;
             phase = comRefBox.gamePhase;
 
-            try
-            {
+            try {
                 Thread.sleep(500);
-            } catch (InterruptedException ex)
-            {
+            } catch (InterruptedException ex) {
                 Logger.getLogger(StateMachine.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            switch (state)
-            {
+            switch (state) {
                 case "INIT":
                     Main.log.info("INIT");
                     break;
@@ -109,23 +101,19 @@ public class StateMachine extends Thread
                     break;
             }
 
-            switch (phase)
-            {
+            switch (phase) {
                 case "SETUP":
                     Main.log.info("SETUP");
                     preGamePhase();
                     break;
                 case "EXPLORATION":
 
-                    if (!exploStep.equals("PROD_POS"))
-                    {
+                    if (!exploStep.equals("PROD_POS")) {
                         Main.log.info("EXPLORATION");
 
-                        try
-                        {
+                        try {
                             explorationPhase();
-                        } catch (InterruptedException ex)
-                        {
+                        } catch (InterruptedException ex) {
                             Main.log.error("InterruptException in EXPLORATION");
                         }
                     }
@@ -133,17 +121,14 @@ public class StateMachine extends Thread
                     break;
                 case "PRODUCTION":
 
-                    if (firstProd)
-                    {
+                    if (firstProd) {
                         prodStep = "START_ROBO";
                         this.firstProd = false;
                     }
 
-                    try
-                    {
+                    try {
                         productionPhase();
-                    } catch (InterruptedException ex)
-                    {
+                    } catch (InterruptedException ex) {
                         Main.log.error("InterruptException in PRODUCTION");
                     }
                     break;
@@ -154,28 +139,24 @@ public class StateMachine extends Thread
         }
     }
 
-    private void preGamePhase()
-    {
+    private void preGamePhase() {
         comView.setStation(0);
         comView.setKoords(0, 0, 0);
         exploStep = "IN_FIELD";
     }
 
-    private void explorationPhase() throws InterruptedException
-    {
+    private void explorationPhase() throws InterruptedException {
         switch (exploStep) //Step in ExploPhase
         {
 
             case "IN_FIELD":
                 // von aussen ins feld hineinfahren
                 JobController job = (JobController) mtc.maintenanceRead("maintenance.dat");
-                if (fc.maintenance)
-                {
+                if (fc.maintenance) {
 
                     way.jobCounter = job.jobCounter;
                     fc.maintenance = false;
-                } else
-                {
+                } else {
                     way.jobCounter = 0;
                 }
 
@@ -202,13 +183,12 @@ public class StateMachine extends Thread
                 break;
 
             case "TO_START":
-;
+                ;
                 drive.setEndTarget(way.getLoadCellNearMachine(way.getExploJob())); // setEndTarget wird auf die Zelle direkt vor der Maschine gestzt
                 drive.takeNext = true;
 
                 Main.log.debug(way.getExploJob());
-                if (begin)
-                {
+                if (begin) {
                     drive.start();
                     begin = false;
                 }
@@ -219,8 +199,7 @@ public class StateMachine extends Thread
                 break;
 
             case "WAIT":
-                if (drive.isEndPosReached())
-                {
+                if (drive.isEndPosReached()) {
                     exploStep = "AT_STATION";
                     drive.endPosReached = false;
                 }
@@ -263,13 +242,11 @@ public class StateMachine extends Thread
 
             case "NEXT":
                 comView.setStation(0);
-                try
-                {
+                try {
                     way.setNextExploJob(); // hier wird der job auf die nächste nummer gesetzt
                     exploStep = "TO_START";
 
-                } catch (Exception ex)
-                {
+                } catch (Exception ex) {
 
                     // funktioniert das???!
                     exploStep = "PROD_POS";
@@ -288,21 +265,16 @@ public class StateMachine extends Thread
         }
     }
 
-    public void waitRoboView()
-    {
+    public void waitRoboView() {
 
         // globale Variblen machen
-        if (comView.getReady() == 1)
-        {
+        if (comView.getReady() == 1) {
             comView.setGo(1);
-        } else if (comView.getEnde() == 1)
-        {
-            if (phase.equals("EXPLORATION"))
-            {
+        } else if (comView.getEnde() == 1) {
+            if (phase.equals("EXPLORATION")) {
                 exploStep = nextStep;
             }
-            if (phase.equals("PRODUCTION"))
-            {
+            if (phase.equals("PRODUCTION")) {
                 prodStep = nextStep;
             }
 
@@ -311,8 +283,7 @@ public class StateMachine extends Thread
 
     }
 
-    private void productionPhase() throws InterruptedException
-    {
+    private void productionPhase() throws InterruptedException {
 
         // readAndSendPhase();
         /**
@@ -323,15 +294,14 @@ public class StateMachine extends Thread
          * ***********************************************************************************************************
          */
         //<editor-fold defaultstate="collapsed" desc="Production for Mr.Brown">
-        if (way.getRoboNameIdx() == 1)
-        {
+        if (way.getRoboNameIdx() == 3) {
 
             switch (prodStep) //Step in production
             {
 
                 case "START_ROBO":      //Testing step
                     BrownT5 = way.getProdMachine("T5", 1);
-                    Main.log.debug("************* STEP START_ROBO*****************");
+                    Main.log.debug("************* STEP START_ROBO_3_IN_PRODUCTION *****************");
 
                     drive.setStartCell(2, 1);
                     drive.setStartPosPhi(180);
@@ -349,8 +319,7 @@ public class StateMachine extends Thread
 
                     comView.setStation(0);
                     drive.setEndTarget(way.getPuckCell());
-                    if (begin)
-                    {
+                    if (begin) {
                         drive.start();
                         begin = false;
                     }
@@ -367,12 +336,13 @@ public class StateMachine extends Thread
                     comView.setStation(3); // es soll nun ins stationsanfahren gehen
                     nextStep = "TO_T5";
                     prodStep = "WAIT_ROBOVIEW";
+                    drive.setStartPosPhi(180);
                     break;
 
                 case "TO_T5":
                     Main.log.debug("************* STEP TO_T5" + way.getLoadCellNearMachine(BrownT5) + " *****************");
                     comView.setStation(0);
-                    drive.setStartPosPhi(180);
+                    
                     //   drive.setEndTarget(way.getLoadCellNearMachine(BrownT5));
                     drive.setEndTarget(way.getLoadCellNearMachine("M9"));
                     drive.takeNext = true;
@@ -392,7 +362,7 @@ public class StateMachine extends Thread
                 case "TAKE_PUCK":
                     Main.log.debug("************* STEP TAKE_PUCK *****************");
                     comView.setStation(0);
-                    comView.setKoords(0, 80, 0);
+                    comView.setKoords(0, 150, 0);
                     nextStep = "ROTATION";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
@@ -408,7 +378,7 @@ public class StateMachine extends Thread
                 case "GO_BACK_TO_CELL_NEAR_MACHINE_T5":
                     Main.log.debug("*************  GO_BACK_TO_CELL_NEAR_MACHINE_T5  *****************");
                     comView.setStation(0);
-                    comView.setKoords(BACKWAY, 80, 0);
+                    comView.setKoords(BACKWAY, 150, 0);
                     nextStep = "TO_WAIT_CELL";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
@@ -416,7 +386,8 @@ public class StateMachine extends Thread
                 case "TO_WAIT_CELL":
                     Main.log.debug("************* STEP TO_WAIT_CELL (1,1) *****************");
                     drive.setStartPosPhi(way.getDirectionOfMachine("M9"));
-                    drive.setEndTarget(way.getWaitCellBrown());
+                    drive.setEndTarget(1, 1);
+                    //drive.setEndTarget(way.getWaitCellBrown());
                     drive.takeNext = true;
                     prodStep = "WAIT_DRIVE";
 
@@ -441,15 +412,12 @@ public class StateMachine extends Thread
 
                 case "ANALYSE_DELIVERY":
                     Main.log.debug("********************  ANALYSE DELIVERY  ********************");
-                    if (comView.getLamp()[2] >= 1)
-                    {
+                    if (comView.getLamp()[2] >= 1) {
                         Main.log.debug("********************  DELIVERY OPEN  ********************");
                         prodStep = "DELIVER";
-                    } else
-                    {
+                    } else {
                         deliveryCount++;
-                        switch (deliveryCount)
-                        {
+                        switch (deliveryCount) {
                             case 1:
                                 Main.log.debug("********************  DELIVERY CLOSE  ********************");
                                 prodStep = "GO_LEFT_DELIVERY";
@@ -458,10 +426,7 @@ public class StateMachine extends Thread
                                 Main.log.debug("********************  DELIVERY CLOSE  ********************");
                                 prodStep = "GO_RIGHT_DELIVERY";
                                 break;
-                            default:
-                                Main.log.debug("********************  ERROR RESTART CYCLE  ********************");
-                                prodStep = "DELIVER";
-                                break;
+
                         }
 
                     }
@@ -479,7 +444,7 @@ public class StateMachine extends Thread
                     Main.log.debug("************* STEP GO_RIGHT_DELIVERY *****************");
                     comView.setStation(0);
                     comView.setKoords(0, -700, 0);
-                    nextStep = "SCAN_DELIVERY";
+                    nextStep = "DELIVER";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
 
@@ -487,25 +452,45 @@ public class StateMachine extends Thread
                     Main.log.debug("********************  DELIVERY DOCKING  ********************");
                     comView.setKoords(0, 0, 0);
 
-                    comView.setStation(4); // es soll nun ins stationsanfahren gehen
+                    comView.setStation(1); // es soll nun ins stationsanfahren gehen
 
-                    nextStep = "BACK";
+                    nextStep = "BACK_A";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
 
-                case "BACK":
-                    Main.log.debug("************* STEP BACK *****************");
+                case "BACK_A":
+                    Main.log.debug("************* STEP BACK A*****************");
                     comView.setStation(0);
-                    switch (deliveryCount)
-                    {
+                    switch (deliveryCount) {
                         case 0:
                             comView.setKoords(-BACKWAY, 0, 0);
+                            nextStep = "FINISH";
+                            prodStep = "WAIT_ROBOVIEW";
                             break;
                         case 1:
-                            comView.setKoords(-BACKWAY, -350, 0);
+                            comView.setKoords(-BACKWAY, 0, 0);
+                            nextStep = "BACK_B";
+                            prodStep = "WAIT_ROBOVIEW";
                             break;
                         case 2:
-                            comView.setKoords(-BACKWAY, 350, 0);
+                            comView.setKoords(-BACKWAY, 0, 0);
+                            nextStep = "BACK_B";
+                            prodStep = "WAIT_ROBOVIEW";
+                            break;
+                    }
+
+
+                    break;
+
+                case "BACK_B":
+                    Main.log.debug("************* STEP BACK B*****************");
+                    comView.setStation(0);
+                    switch (deliveryCount) {
+                        case 1:
+                            comView.setKoords(0, -350, 0);
+                            break;
+                        case 2:
+                            comView.setKoords(0, 350, 0);
                             break;
                     }
 
@@ -529,12 +514,10 @@ public class StateMachine extends Thread
 
                 case "WAIT_DRIVE":
                     Main.log.debug("************* STEP WAIT_DRIVE *****************");
-                    if (drive.isEndPosReached())
-                    {
+                    if (drive.isEndPosReached()) {
                         prodCount++;
                         drive.endPosReached = false;
-                        switch (prodCount)
-                        {
+                        switch (prodCount) {
                             case 1:
                                 prodStep = "CATCH";
                                 break;
@@ -544,8 +527,7 @@ public class StateMachine extends Thread
                             case 3:
                                 DeliveryGate dg = way.isProductDelGateOpen("P3");
                                 //if (dg!=null && way.isProductDelGateOpen("P3").getNumber()==DeliveryGate.ANY_VALUE)
-                                if (dg != null && way.isProductDelGateOpen("P3").ANY.getNumber() == 1)
-                                {
+                                if (dg != null && way.isProductDelGateOpen("P3").ANY.getNumber() == 1) {
                                     prodStep = "TO_DELIVERY";
                                 }
                                 break;
@@ -574,8 +556,7 @@ public class StateMachine extends Thread
          * ************************************************************************************************************
          */
         //<editor-fold defaultstate="collapsed" desc="Production for Mr.Pink and Mr.Blond">
-        if ((way.getRoboNameIdx() == 2) || (way.getRoboNameIdx() == 0))
-        {
+        if ((way.getRoboNameIdx() == 1) || (way.getRoboNameIdx() == 2)) {
 
             switch (prodStep) //Step in production
             {
@@ -612,12 +593,9 @@ public class StateMachine extends Thread
                 case "CATCH":
                     Main.log.debug("************* STEP CATCH *****************");
                     comView.setKoords(0, 0, 0);
-
                     Main.log.debug("CATCH THE PUCK");
-
                     comView.setStation(3); // es soll nun ins stationsanfahren gehen
-                    switch (prodCount)
-                    {
+                    switch (prodCount) {
                         case 1:
                             nextStep = "TO_T1";
                             prodStep = "WAIT_ROBOVIEW";
@@ -636,14 +614,15 @@ public class StateMachine extends Thread
                             break;
 
                     }
+                    drive.setStartPosPhi(180);
                     break;
 
                 case "TO_T1":
-                    if (way.getRoboNameIdx() == 0) //Machine for Mr.Pink
+                    if (way.getRoboNameIdx() == 1) //Machine for Mr.Pink
                     {
                         Main.log.debug("************* STEP TO_T1" + way.getLoadCellNearMachine(PinkT1) + " *****************");
                         comView.setStation(0);
-                        drive.setStartPosPhi(180);
+                        
                         drive.setEndTarget(way.getLoadCellNearMachine(PinkT1));
 
                         drive.takeNext = true;
@@ -652,7 +631,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T1" + way.getLoadCellNearMachine(BlondT1) + " *****************");
                         comView.setStation(0);
-                        drive.setStartPosPhi(180);
+                        
                         drive.setEndTarget(way.getLoadCellNearMachine(BlondT1));
 
                         drive.takeNext = true;
@@ -661,11 +640,11 @@ public class StateMachine extends Thread
                     break;
 
                 case "TO_T2":
-                    if (way.getRoboNameIdx() == 0) //Machine for Mr.Pink
+                    if (way.getRoboNameIdx() == 1) //Machine for Mr.Pink
                     {
                         Main.log.debug("************* STEP TO_T2" + way.getLoadCellNearMachine(PinkT2) + " *****************");
                         comView.setStation(0);
-                        drive.setStartPosPhi(180);
+                        
                         drive.setEndTarget(way.getLoadCellNearMachine(PinkT2));
 
                         drive.takeNext = true;
@@ -674,7 +653,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T2" + way.getLoadCellNearMachine(BlondT2) + " *****************");
                         comView.setStation(0);
-                        drive.setStartPosPhi(180);
+                        
                         drive.setEndTarget(way.getLoadCellNearMachine(BlondT2));
 
                         drive.takeNext = true;
@@ -683,11 +662,11 @@ public class StateMachine extends Thread
                     break;
 
                 case "TO_T3/4":
-                    if (way.getRoboNameIdx() == 0) //Machine for Mr.Pink
+                    if (way.getRoboNameIdx() == 1) //Machine for Mr.Pink
                     {
                         Main.log.debug("************* STEP TO_T3" + way.getLoadCellNearMachine(PinkT3) + " *****************");
                         comView.setStation(0);
-                        drive.setStartPosPhi(180);
+                        
                         drive.setEndTarget(way.getLoadCellNearMachine(PinkT3));
 
                         drive.takeNext = true;
@@ -696,7 +675,7 @@ public class StateMachine extends Thread
                     {
                         Main.log.debug("************* STEP TO_T4" + way.getLoadCellNearMachine(BlondT4) + " *****************");
                         comView.setStation(0);
-                        drive.setStartPosPhi(180);
+                        
                         drive.setEndTarget(way.getLoadCellNearMachine(BlondT4));
 
                         drive.takeNext = true;
@@ -706,7 +685,7 @@ public class StateMachine extends Thread
                 case "TO_WAITING_CELL_PINK":
                     Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                     comView.setStation(0);
-                    drive.setStartPosPhi(180);
+                    
                     drive.setEndTarget(way.getWaitCellPink());
 
                     drive.takeNext = true;
@@ -716,7 +695,7 @@ public class StateMachine extends Thread
                 case "TO_WAITING_CELL_BLOND":
                     Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                     comView.setStation(0);
-                    drive.setStartPosPhi(180);
+                    
                     drive.setEndTarget(way.getWaitCellBlond());
 
                     drive.takeNext = true;
@@ -728,8 +707,7 @@ public class StateMachine extends Thread
                     comView.setKoords(0, 0, 0);
 
                     comView.setStation(1); // It don't care about the light
-                    switch (prodCount)
-                    {
+                    switch (prodCount) {
                         case 2://charge first s0 on T1 
                             nextStep = "BACK_STANDARD";
                             prodStep = "WAIT_ROBOVIEW";
@@ -755,8 +733,7 @@ public class StateMachine extends Thread
                     comView.setKoords(0, 0, 0);
 
                     comView.setStation(5); // Wait for intermediate light (orange)
-                    switch (prodCount)
-                    {
+                    switch (prodCount) {
                         case 4:
                             nextStep = "MOVE_LEFT_SIDE_A";
                             prodStep = "WAIT_ROBOVIEW";
@@ -777,8 +754,7 @@ public class StateMachine extends Thread
                     comView.setKoords(0, 0, 0);
 
                     comView.setStation(6); // Wait for the final light (green)
-                    switch (prodCount)
-                    {
+                    switch (prodCount) {
                         case 5:                 //Take the finished puck from T1
                             nextStep = "PUCK_TAKEN_A";
                             prodStep = "WAIT_ROBOVIEW";
@@ -800,7 +776,7 @@ public class StateMachine extends Thread
                 case "PUCK_TAKEN_A":
                     Main.log.debug("************* PUCK_TAKEN_A *****************");
                     comView.setStation(0);
-                    comView.setKoords(0, 80, 0);
+                    comView.setKoords(0, 150, 0);
                     nextStep = "PUCK_TAKEN_B";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
@@ -816,21 +792,28 @@ public class StateMachine extends Thread
                 case "PUCK_TAKEN_C":
                     Main.log.debug("************* PUCK_TAKEN_C *****************");
                     comView.setStation(0);
-                    comView.setKoords(240, 80, 0);
-                    switch (prodCount)
-                    {
+                    comView.setKoords(240, 150, 0);
+                    switch (prodCount) {
                         case 5:
                             nextStep = "TO_T2";
                             prodStep = "WAIT_ROBOVIEW";
+                            if (way.getRoboNameIdx() == 1)
+                            {
+                            drive.setStartPosPhi(way.getDirectionOfMachine(PinkT1));
+                            }
+                            else
+                            {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(BlondT1));
+                            }
                             break;
                         case 9:             //case for waiting cell
-                            if (way.getRoboNameIdx() == 0)
-                            {
+                            if (way.getRoboNameIdx() == 0) {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(PinkT3));
                                 nextStep = "TO_WAITING_CELL_PINK";
                                 prodStep = "WAIT_ROBOVIEW";
                             }
-                            if (way.getRoboNameIdx() == 2)
-                            {
+                            if (way.getRoboNameIdx() == 2) {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(BlondT4));
                                 nextStep = "TO_WAITING_CELL_BLOND";
                                 prodStep = "WAIT_ROBOVIEW";
                             }
@@ -838,18 +821,35 @@ public class StateMachine extends Thread
                         case 11:
                             nextStep = "TO_T3/4";
                             prodStep = "WAIT_ROBOVIEW";
+                            if (way.getRoboNameIdx() == 1)
+                            {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(PinkT2));
+                            }
+                            else
+                            {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(BlondT2));
+                            }
                             break;
                         case 13:
                             nextStep = "TO_T3/4";
                             prodStep = "WAIT_ROBOVIEW";
+                            if (way.getRoboNameIdx() == 1)
+                            {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(PinkT1));
+                            }
+                            else
+                            {
+                                drive.setStartPosPhi(way.getDirectionOfMachine(BlondT1));
+                            }
                             break;
                     }
+                    
                     break;
 
                 case "MOVE_LEFT_SIDE_A":
                     Main.log.debug("************* MOVE_LEFT_SIDE_A *****************");
                     comView.setStation(0);
-                    comView.setKoords(0, 100, 0);
+                    comView.setKoords(0, 150, 0);
                     nextStep = "MOVE_LEFT_SIDE_B";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
@@ -865,7 +865,7 @@ public class StateMachine extends Thread
                 case "MOVE_RIGHT_SIDE_A":
                     Main.log.debug("************* MOVE_RIGHT_SIDE_A *****************");
                     comView.setStation(0);
-                    comView.setKoords(0, -100, 0);
+                    comView.setKoords(0, -150, 0);
                     nextStep = "MOVE_RIGHT_SIDE_B";
                     prodStep = "WAIT_ROBOVIEW";
                     break;
@@ -881,9 +881,8 @@ public class StateMachine extends Thread
                 case "BACK_FROM_LEFT_SIDE":
                     Main.log.debug("************* BACK_FROM_LEFT_SIDE *****************");
                     comView.setStation(0);
-                    comView.setKoords(-80 - BACKWAY, -100, 0);
-                    switch (prodCount)
-                    {
+                    comView.setKoords(-80 - BACKWAY, -150, 0);
+                    switch (prodCount) {
                         case 4:
                             nextStep = "TO_T1";
                             prodStep = "WAIT_ROBOVIEW";
@@ -899,7 +898,7 @@ public class StateMachine extends Thread
                 case "BACK_FROM_RIGHT_SIDE":
                     Main.log.debug("************* BACK_FROM_RIGHT_SIDE *****************");
                     comView.setStation(0);
-                    comView.setKoords(-80 - BACKWAY, 100, 0);
+                    comView.setKoords(-80 - BACKWAY, 150, 0);
 
                     nextStep = "TO_T1";
                     prodStep = "WAIT_ROBOVIEW";
@@ -910,8 +909,7 @@ public class StateMachine extends Thread
                     Main.log.debug("************* STEP BACK *****************");
                     comView.setStation(0);
                     comView.setKoords(-BACKWAY, 0, 0);
-                    switch (prodCount)
-                    {
+                    switch (prodCount) {
                         case 2:
                             nextStep = "TO_PUCK_AREA";
                             prodStep = "WAIT_ROBOVIEW";
@@ -921,12 +919,10 @@ public class StateMachine extends Thread
                             prodStep = "WAIT_ROBOVIEW";
                             break;
                         case 8:                 //Division between normal way and delivery
-                            if (prodFinalStep != true)
-                            {
+                            if (prodFinalStep != true) {
                                 nextStep = "TO_PUCK_AREA";
                                 prodStep = "WAIT_ROBOVIEW";
-                            } else
-                            {
+                            } else {
                                 nextStep = "TO_T3/4";
                                 prodStep = "WAIT_ROBOVIEW";
                             }
@@ -967,15 +963,12 @@ public class StateMachine extends Thread
 
                 case "ANALYSE_DELIVERY":
                     Main.log.debug("********************  ANALYSE DELIVERY  ********************");
-                    if (comView.getLamp()[2] >= 1)
-                    {
+                    if (comView.getLamp()[2] >= 1) {
                         Main.log.debug("********************  DELIVERY OPEN  ********************");
                         prodStep = "DELIVER";
-                    } else
-                    {
+                    } else {
                         deliveryCount++;
-                        switch (deliveryCount)
-                        {
+                        switch (deliveryCount) {
                             case 1:
                                 Main.log.debug("********************  DELIVERY CLOSE  ********************");
                                 prodStep = "GO_LEFT_DELIVERY";
@@ -1035,21 +1028,21 @@ public class StateMachine extends Thread
 
                 case "WAIT_DRIVE":
                     Main.log.debug("************* STEP WAIT_DRIVE *****************");
-                    if (drive.isEndPosReached())
-                    {
+                    if (drive.isEndPosReached()) {
 
                         drive.endPosReached = false;
 
                         prodCount++;
-                        switch (prodCount)
-                        {
+                        switch (prodCount) {
                             case 1:
+                                Main.log.debug("************* STEP TO_PUCK_AREA *****************");
                                 prodStep = "CATCH";
                                 break;
                             case 2:
                                 prodStep = "STATION_DOCKING";
                                 break;
                             case 3:
+                                Main.log.debug("************* STEP TO_PUCK_AREA *****************");
                                 prodStep = "CATCH";
                                 break;
                             case 4:
@@ -1062,40 +1055,35 @@ public class StateMachine extends Thread
                                 prodStep = "STATION_DOCKING";
                                 break;
                             case 7:
+                                Main.log.debug("************* STEP TO_PUCK_AREA *****************");
                                 prodStep = "CATCH";
                                 break;
                             case 8:
                                 prodStep = "STATION_DOCKING";
                                 break;
                             case 9:              //Division between normal way and delivery
-                                if (prodFinalStep != true)
-                                {
+                                if (prodFinalStep != true) {
+                                    Main.log.debug("************* STEP TO_PUCK_AREA *****************");
                                     prodStep = "CATCH";
-                                } else
-                                {
+                                } else {
                                     prodStep = "PUCK_FINISHED";
                                 }
                                 break;
                             case 10:
-                                if (prodFinalStep != true)
-                                {
+                                if (prodFinalStep != true) {
                                     prodStep = "PUCK_SCANNED";
-                                } else
-                                {
-                                    if (way.getRoboNameIdx() == 0)
-                                    {
+                                } else {
+                                    Main.log.debug("************* STEP TO_WAITING_CELL *****************");
+                                    if (way.getRoboNameIdx() == 1) {
                                         DeliveryGate dg = way.isProductDelGateOpen("P1");
                                         //if (dg!=null && way.isProductDelGateOpen("P1").getNumber()==DeliveryGate.ANY_VALUE)
-                                        if (dg != null && way.isProductDelGateOpen("P1").ANY.getNumber() == 1)
-                                        {
+                                        if (dg != null && way.isProductDelGateOpen("P1").ANY.getNumber() == 1) {
                                             prodStep = "TO_DELIVERY";
                                         }
-                                    } else
-                                    {
+                                    } else {
                                         DeliveryGate dg = way.isProductDelGateOpen("P2");
                                         //if (dg!=null && way.isProductDelGateOpen("P2").getNumber()==DeliveryGate.ANY_VALUE)
-                                        if (dg != null && way.isProductDelGateOpen("P2").ANY.getNumber() == 1)
-                                        {
+                                        if (dg != null && way.isProductDelGateOpen("P2").ANY.getNumber() == 1) {
                                             prodStep = "TO_DELIVERY";
                                         }
                                     }
@@ -1103,11 +1091,9 @@ public class StateMachine extends Thread
 
                                 break;
                             case 11:
-                                if (prodFinalStep != true)
-                                {
+                                if (prodFinalStep != true) {
                                     prodStep = "PUCK_FINISHED";
-                                } else
-                                {
+                                } else {
                                     prodStep = "SCAN_DELIVERY";
                                 }
                                 break;
@@ -1136,7 +1122,6 @@ public class StateMachine extends Thread
         //</editor-fold>
     }
 
-    private void postGame()
-    {
+    private void postGame() {
     }
 }
