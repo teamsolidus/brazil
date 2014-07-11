@@ -107,6 +107,7 @@ public class ComRefBox
   {
     ROBOT_NAME = Main.name;
     TEAM_COLOR = JobController.TEAM;
+    ENCRYPTION_KEY=Main.encKey;
     JERSEY_NR = Main.getJerseyNr();
     HOST = ip;
 
