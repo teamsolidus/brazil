@@ -390,7 +390,8 @@ public class StateMachine extends Thread
                     break;
 
                 case "TO_PUCK_AREA":
-
+                    //if (roboAtPucks)
+                    //{
                     comView.setStation(0);
                     drive.setEndTarget(way.getPuckCell());
                     if (begin)
@@ -400,6 +401,7 @@ public class StateMachine extends Thread
                     }
                     drive.takeNext = true;
                     prodStep = "WAIT_DRIVE";
+                    //}
                     break;
 
                 case "CATCH":
@@ -469,9 +471,12 @@ public class StateMachine extends Thread
 
                 case "TO_DELIVERY":
                     Main.log.debug("************* STEP TO_DELIVERY * " + way.getDeliveryCell() + "****************");
+                    //if (roboAtPucks)
+                    //{
                     drive.setEndTarget(way.getDeliveryCell());
                     drive.takeNext = true;
                     prodStep = "WAIT_DRIVE";
+                    //}
                     break;
 
                 case "SCAN_DELIVERY":
@@ -768,7 +773,8 @@ public class StateMachine extends Thread
                         break;
 
                     case "TO_PUCK_AREA":
-
+                        //if (!roboAtPucks)
+                        //{
                         comView.setStation(0);
                         drive.setEndTarget(way.getPuckCell());
                         if (begin) //Only for test
@@ -778,6 +784,7 @@ public class StateMachine extends Thread
                         }
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
+                        //}
                         break;
 
                     case "CATCH":
@@ -874,7 +881,7 @@ public class StateMachine extends Thread
                         }
                         break;
                     case "TO_WAITING_CELL_PINK":
-                        
+
                         Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                         comView.setStation(0);
 
@@ -882,11 +889,11 @@ public class StateMachine extends Thread
 
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
-                        
+
                         break;
 
                     case "TO_WAITING_CELL_BLOND":
-                        
+
                         Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                         comView.setStation(0);
 
@@ -894,7 +901,7 @@ public class StateMachine extends Thread
 
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
-                        
+
                         break;
 
                     case "STATION_DOCKING":
@@ -1146,11 +1153,13 @@ public class StateMachine extends Thread
                     //Delivery steps
                     case "TO_DELIVERY":
                         Main.log.debug("************* STEP TO_DELIVERY *****************");
+                        //if (!roboAtPucks)
+                        //{
                         drive.setStartPosPhi(180);
                         drive.setEndTarget(way.getDeliveryCell());
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
-
+                        //}
                         break;
 
                     case "SCAN_DELIVERY":
