@@ -51,7 +51,7 @@ public class Drive extends Thread
     int[] startCellsY = new int[30];
     int countX = 0;
     int countY = 0;
-    public boolean paused;
+
     private Cell endCell;
     private Cell startCell;
     int turnPhi;

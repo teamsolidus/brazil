@@ -48,6 +48,7 @@ public class StateMachine extends Thread
     private boolean prodFinalStep = false;
     private boolean firstProd = true;
     private boolean begin = true;
+    private boolean firstPause;
     String nextStep;
     Maintenance mtc;
 
@@ -93,11 +94,48 @@ public class StateMachine extends Thread
                     Main.log.info("WAIT_START");
                     break;
                 case "RUNNING":
+                    if (firstPause)
+                    {
+                        for (int i = comView.breakingFactor; i <= 100; i= i+10)
+                    {
+                        comView.breakingFactor=i;
+                            try
+                            {
+                                Thread.sleep(200);
+                            } catch (InterruptedException ex)
+                            {
+                                Logger.getLogger(StateMachine.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        
+                    }
+                    
+                    firstPause = true;   
+                    }
                     Main.log.info("RUNNING");
                     break;
                 case "PAUSED":
                     Main.log.info("PAUSED");
-                    drive.paused = true;
+                    if (!firstPause)
+                    {
+                        
+                    
+                    for (int i = comView.breakingFactor; i > 0; i= i-10)
+                    {
+                        comView.breakingFactor=i;
+                        
+                        try
+                        {
+                            Thread.sleep(200);
+                        } catch (InterruptedException ex)
+                        {
+                            Logger.getLogger(StateMachine.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                    }
+                    
+                    firstPause = true;
+                    }
+                    
                     break;
             }
 
