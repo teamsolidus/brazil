@@ -25,7 +25,7 @@ public class StateMachine extends Thread {
     private boolean running;
     private ComView comView;
     private JobController way;
-    private ComRefBox comRefBox;
+    public ComRefBox comRefBox;
     private Drive drive;
     private FieldCommander fc;
     private String phase;//="EXPLORATION"; 
@@ -191,6 +191,8 @@ public class StateMachine extends Thread {
                 if (fc.maintenance) {
 
                     way.jobCounter = job.jobCounter;
+                    
+                   
                     fc.maintenance = false;
                 } else {
                     way.jobCounter = 0;
@@ -339,14 +341,19 @@ public class StateMachine extends Thread {
                 case "START_ROBO":      //Testing step
                     BrownT5 = way.getProdMachine("T5", 1);
                     Main.log.debug("************* STEP START_ROBO_3_IN_PRODUCTION *****************");
-
-                    //drive.setStartCell(2, 1);               //Test
-                    //drive.setStartPosPhi(180);              //Test
+                    
+                    drive.setStartCell(2, 1);               //Test
+                    drive.setStartPosPhi(180);              //Test
 
 
                     /* drive.goStart(way.getStartKoordX(), way.getStartKoordY(), STARTPHI);
                      drive.setStartPosPhi(180);*/
                     //******************ACHTUNG: Methode für ins Feld hineinfahren noch nicht implementiert
+                    DeliveryGate dg = way.isProductDelGateOpen("P3");
+                    //if (dg!=null && way.isProductDelGateOpen("P3").getNumber()==DeliveryGate.ANY_VALUE)
+                    if (dg != null && way.isProductDelGateOpen("P3").ANY.getNumber() == 1) {
+                        Main.log.debug("************* Deliver detected *****************");
+                    }
                     prodStep = "TO_PUCK_AREA";
                     break;
 
@@ -559,11 +566,11 @@ public class StateMachine extends Thread {
                                 prodStep = "STATION";
                                 break;
                             case 3:
-                                DeliveryGate dg = way.isProductDelGateOpen("P3");
+                                //DeliveryGate dg = way.isProductDelGateOpen("P3");
                                 //if (dg!=null && way.isProductDelGateOpen("P3").getNumber()==DeliveryGate.ANY_VALUE)
-                                if (dg != null && way.isProductDelGateOpen("P3").ANY.getNumber() == 1) {
+                                //if (dg != null && way.isProductDelGateOpen("P3").ANY.getNumber() == 1) {
                                     prodStep = "TO_DELIVERY";
-                                }
+                                //}
                                 break;
                             case 4:
                                 prodStep = "SCAN_DELIVERY";

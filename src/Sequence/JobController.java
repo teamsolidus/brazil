@@ -459,7 +459,7 @@ public class JobController implements Serializable
           {   //is the delivery gate already open
             if (order.getDeliveryPeriodBegin() <= comRefBox.game.getGameTime().getSec())
             {   //is the delivery gate still open in realistic time
-              if (order.getDeliveryPeriodEnd() >= comRefBox.game.getGameTime().getSec() - REALISTICTIME)
+              if (order.getDeliveryPeriodEnd() >= comRefBox.game.getGameTime().getSec() + REALISTICTIME)
               {
                 return order.getDeliveryGate();
               }
