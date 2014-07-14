@@ -23,6 +23,6 @@ public class LaserFactory
     
     public IEnvironmentSensor getEnvironmentSensor()
     {
-        return Scenario2.getInstance();
+        return Scenario1.getInstance();
     }
 }

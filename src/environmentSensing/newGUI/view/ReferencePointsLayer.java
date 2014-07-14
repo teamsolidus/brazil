@@ -8,6 +8,8 @@ import References.ReferencePoint;
 import References.view.GUIReference;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JPanel;
 
 /**
@@ -19,6 +21,8 @@ public class ReferencePointsLayer extends JPanel
     private final int DIAMETER;
     
     private GUIReference guiReference;
+    
+    private List<AReferencePoint> pointsToDrawing;
     
     AReferencePoint robo, laser;
     
@@ -32,20 +36,30 @@ public class ReferencePointsLayer extends JPanel
         this.setLocation(0, 0);
         this.setVisible(true);
         
-        robo = new ReferencePoint(-1000, 2500, 241, AbsoluteReferencePoint.getInstance());
-        laser = new LinearDependentReferencePoint(500, 0, 0, robo);
+        this.pointsToDrawing = new ArrayList<>();
+        
+        //robo = new ReferencePoint(-1000, 2500, 241, AbsoluteReferencePoint.getInstance());
+        //laser = new LinearDependentReferencePoint(500, 0, 0, robo);
+    }
+    
+    public List<AReferencePoint> getPointsForDrawing()
+    {
+        return this.pointsToDrawing;
     }
     
     @Override
     protected void paintComponent(Graphics g)
     {
         this.paintComponents(g);
-        
-        //this.drawReferencePoint(new ReferencePoint(2000, 2000, 45, AbsoluteReferencePoint.getInstance()), g);
         this.drawAbsoluteReferencePoint(AbsoluteReferencePoint.getInstance(), g);
         
-        this.drawReferencePoint(robo, g);
-        this.drawReferencePoint(laser, g);
+        for(AReferencePoint point : this.pointsToDrawing)
+        {
+            this.drawReferencePoint(point, g);
+        }
+        
+        //this.drawReferencePoint(robo, g);
+        //this.drawReferencePoint(laser, g);
     }
     
     public void drawReferencePoint(AReferencePoint drawingReference, Graphics g)
