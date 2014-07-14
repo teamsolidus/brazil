@@ -89,31 +89,13 @@ public class Drive extends Thread
         while (running)
         {
 
-            if (paused)
-            {
-                if (!sM.comRefBox.gameState.equals("PAUSED"))
-                {
-                    comView.breakingFactor = 100;
-                }
-                try
-                {
-                    paused();
-                } catch (InterruptedException ex)
-                {
-                    Logger.getLogger(Drive.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-            }
-          
-            
-           // fc.setRoboPos(Main.getJerseyNr(),xAbsolut, yAbsolut, 1);
-
+            // fc.setRoboPos(Main.getJerseyNr(),xAbsolut, yAbsolut, 1);
             if ((avoid || fc.avoidTest) && !avoidStart)
             {
 
                 step = "AVOID";
             }
-         
+
             try
             {
                 Thread.sleep(300);
@@ -311,24 +293,34 @@ public class Drive extends Thread
                 {
 
                     comView.setGo(1);
+                    calcActPos();
+                    System.out.println(yAbsolut);
+                    System.out.println(xAbsolut);
                     //    Thread.sleep(110);
 
                 } else if (comView.getEnde() == 1) // sobald dann die bestätigung kommt, dass die koordinaten geschrieben wurden kann in den nächsten step gewechselt werden
                 {
                     comView.setGo(0);
 
+                    if (startCellX >= endTargetX)
+                    {
+                        oldX = oldX - lastDeltaX;
+
+                    } else
+                    {
+                        oldX = oldX + lastDeltaX;
+                    }
+
                     drivingX = false;
-     
-                    oldX = oldX + lastDeltaX;
+
                     // prepared for using positioning method
                     // range???
                     // whats to do when not in range? turn and watch other wall?
                     if (deltaCellsX > 9)
                     {
-                        calcActPos();
+
                         ReferencePoint temp = new ReferencePoint(this.xAbsolut, this.yAbsolut, startPosPhi, AbsoluteReferencePoint.getInstance());
-                        System.out.println(yAbsolut);
-                        System.out.println(xAbsolut);
+
                         pos.correctPosition(temp);
 
                     }
@@ -493,17 +485,24 @@ public class Drive extends Thread
                 if (comView.getReady() == 1) // sobald ready vom view kommt soll mit dem senden von Go begonnen werden
                 {
                     comView.setGo(1);
-                } else if (comView.getEnde() == 1) // sobald dann die bestätigung kommt, dass die koordinaten geschrieben wurden kann in den nächsten step gewechselt werden
-                {
-
-                    drivingY = false;
                     calcActPos();
                     System.out.println(xAbsolut);
                     System.out.println(yAbsolut);
+                    drivingY = false;
+
+                } else if (comView.getEnde() == 1) // sobald dann die bestätigung kommt, dass die koordinaten geschrieben wurden kann in den nächsten step gewechselt werden
+                {
+
+                    if (startCellY >= endTargetY)
+                    {
+                        oldY = oldY - lastDeltaY;
+
+                    } else
+                    {
+                        oldY = oldY + lastDeltaY;
+                    }
 
                     comView.setGo(0);
-
-                    oldY = oldY + lastDeltaY;
 
                     step = "START";
 
@@ -822,14 +821,6 @@ public class Drive extends Thread
 
     }
 
-    public void paused() throws InterruptedException
-    {
-        comView.breakingFactor = 0;
-        Thread.sleep(300);
-
-        /// PAUSENSTATUS
-    }
-
     public void rotate(String getCase) throws InterruptedException
     {
         /*        
@@ -911,7 +902,7 @@ public class Drive extends Thread
         if (drivingX)
         {
 
-            if (startCellX >= endTargetX)
+            if (startCellsX[countX - 1] >= endTargetX)
             {
                 xAbsolut = oldX - comView.getxAktuell();
 
@@ -924,7 +915,7 @@ public class Drive extends Thread
         }
         if (drivingY)
         {
-            if (startCellY >= endTargetY)
+            if (startCellsY[countY - 1] >= endTargetY)
             {
                 yAbsolut = oldY - comView.getxAktuell();
 
@@ -1025,8 +1016,8 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(9, 0);
-        drive.setEndTarget(14, 3);
+        drive.setStartCell(9, 1);
+        drive.setEndTarget(5, 2);
         drive.setStartPosPhi(180);
 
         drive.start();
