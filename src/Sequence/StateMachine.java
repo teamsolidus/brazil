@@ -96,14 +96,13 @@ public class StateMachine extends Thread
                 case "RUNNING":
                     if (firstPause)
                     {
-                        for (int i = comView.breakingFactor; i <= 100; i= i+10)
+                        for (int i = comView.breakingFactor; i <= 100; i= i+1)
                     {
                         comView.breakingFactor=i;
-                            try
-                            {
-                                Thread.sleep(200);
-                            } catch (InterruptedException ex)
-                            {
+                            try {
+                                Thread.sleep(80);
+                                
+                            } catch (InterruptedException ex) {
                                 Logger.getLogger(StateMachine.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         
@@ -119,17 +118,16 @@ public class StateMachine extends Thread
                     {
                         
                     
-                    for (int i = comView.breakingFactor; i > 0; i= i-10)
+                    for (int i = comView.breakingFactor; i >= 0; i= i-1)
                     {
                         comView.breakingFactor=i;
-                        
-                        try
-                        {
-                            Thread.sleep(200);
-                        } catch (InterruptedException ex)
-                        {
+                        try {
+                            Thread.sleep(80);
+                            
+                        } catch (InterruptedException ex) {
                             Logger.getLogger(StateMachine.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                       
                         
                     }
                     
@@ -176,6 +174,7 @@ public class StateMachine extends Thread
             }
         }
     }
+    
 
     private void preGamePhase() {
         comView.setStation(0);
@@ -201,7 +200,7 @@ public class StateMachine extends Thread
                 Thread.sleep((Main.jerseyNr - 1) * 2000);
 
                 //******************* DAVON AUSGEGANGEN ES WIRD VON 180° GESTARTET UND IN X AUF EINER ZELLENMITTE *************************
-                comView.setKoords(way.getStartCell().getY() - way.getStartKoordY(), 0, 0);
+                comView.setKoords(way.getStartCell().getRealY() - way.getStartKoordY(), 0, 0);
 
                 nextStep = "START_ROBO";
 
@@ -233,6 +232,7 @@ public class StateMachine extends Thread
                 Main.log.debug(way.getLoadCellNearMachine(way.getExploJob()).getX());
                 Main.log.debug(way.getLoadCellNearMachine(way.getExploJob()).getY());
                 mtc.maintenanceWrite(way, "maintenance.dat");
+                System.out.println(way.jobCounter);
                 exploStep = "WAIT";
                 break;
 

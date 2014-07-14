@@ -129,7 +129,7 @@ public class Drive extends Thread
                     printCellX = startCellX;
                     printCellY = startCellY;
 
-                    if (startCellX == 0)
+                    if (startCellX == 0 || endTargetX == 0)
                     {
                         firstY = true;
                     }
@@ -152,7 +152,7 @@ public class Drive extends Thread
                     step = "ROTATE_Y";
 
                 }
-                if ((((startCellY % 2) != 0) || endTargetY == 0 || startCellY == 0 || endTargetX == 0) && !firstY)
+                if ((((startCellY % 2) != 0) || endTargetY == 0 || startCellY == 0) && !firstY)
                 {
                     step = "ROTATE_X";
 
@@ -1016,8 +1016,8 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(9, 1);
-        drive.setEndTarget(5, 2);
+        drive.setStartCell(1, 1);
+        drive.setEndTarget(0, 7);
         drive.setStartPosPhi(180);
 
         drive.start();
