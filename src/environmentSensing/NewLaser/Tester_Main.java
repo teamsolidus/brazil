@@ -1,7 +1,7 @@
-package Laser;
+package environmentSensing.NewLaser;
 
-import Laser.TiM.TiM55x;
-import Laser.Data.IDataProvider;
+import environmentSensing.NewLaser.Data.IDataProvider;
+import environmentSensing.NewLaser.TiM.TiM55x;
 import java.util.Observable;
 import java.util.Observer;
 

@@ -1,8 +1,8 @@
 
-package Laser.Operation;
+package environmentSensing.NewLaser.Operation;
 
-import Laser.Communication.IComWriter;
-import Laser.Interpretation.Command;
+import environmentSensing.NewLaser.Communication.IComWriter;
+import environmentSensing.NewLaser.Interpretation.Command;
 
 /**
  *

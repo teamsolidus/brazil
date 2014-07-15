@@ -1,5 +1,5 @@
 
-package Laser.Solidus;
+package environmentSensing.NewLaser.Solidus;
 
 /**
  *

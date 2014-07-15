@@ -1,6 +1,6 @@
-package Laser.Interpretation;
+package environmentSensing.NewLaser.Interpretation;
 
-import Laser.Communication.INewDataByteListener;
+import environmentSensing.NewLaser.Communication.INewDataByteListener;
 
 /**
  *

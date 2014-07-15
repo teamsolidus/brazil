@@ -1,29 +1,29 @@
-package Laser.Solidus;
+package environmentSensing.NewLaser.Solidus;
 
-import Laser.Data.DataMaskAverage;
-import Laser.Data.DataMaskCoordinates;
-import Laser.Data.IDataProvider;
-import Laser.CollisionControll.MonitorArea;
-import Laser.References.IReferencePointContainer;
-import Laser.References.ReferencePoint;
-import Laser.TiM.TiM55x;
-import Laser.References.MainReferencePoint;
-import Laser.References.RelativeReferencePoint;
+import References.AbsoluteReferencePoint;
+import environmentSensing.NewLaser.Data.IDataProvider;
+import References.IReferencePointContainer;
+import References.ReferencePoint;
+import environmentSensing.collisionDetection.MonitorArea;
+import environmentSensing.NewLaser.Data.DataMaskAverage;
+import environmentSensing.NewLaser.Data.DataMaskCoordinates;
+import environmentSensing.NewLaser.TiM.ILaserscanner;
+import environmentSensing.NewLaser.TiM.TiM55x;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 public class Laser implements IReferencePointContainer, Observer, ILaserOperatorSolidus
 {
 
     //Objekte
-    private TiM55x tim;
+    private ILaserscanner tim;
     private ReferencePoint referencePoint;
-    private DataMaskAverage average;
-    private MonitorArea collAera;
+    private DataMaskAverage dataMaskAverage;
+    private MonitorArea monitorArea;
     
     //TEMP SOLIDUS
     private GUIControllerSolidus gui;
@@ -31,9 +31,9 @@ public class Laser implements IReferencePointContainer, Observer, ILaserOperator
     public Laser() throws IOException
     {
         this.tim = new TiM55x();
-        this.referencePoint = new RelativeReferencePoint(0, 0, 0, MainReferencePoint.getInstance());
-        this.average = new DataMaskAverage(10);
-        this.collAera = new MonitorArea(this.getReferencePoint(), ReferencePoint.Type.ABSOLUTE);
+        this.referencePoint = new ReferencePoint(0, 0, 0, AbsoluteReferencePoint.getInstance());
+        this.dataMaskAverage = new DataMaskAverage(10);
+        this.monitorArea = new MonitorArea(this.getReferencePoint());
 
         this.gui = new GUIControllerSolidus(this);
         
@@ -41,14 +41,14 @@ public class Laser implements IReferencePointContainer, Observer, ILaserOperator
         this.tim.addObserver(gui);
     }
 
-    public TiM55x operateTim()
+    public ILaserscanner operateTim()
     {
         return this.tim;
     }
 
     public IDataProvider<Point> getCoordinatesData() throws Exception
     {
-        return new DataMaskCoordinates(this.average, this.referencePoint, ReferencePoint.Type.RELATIVE);
+        return new DataMaskCoordinates(this.dataMaskAverage, this.referencePoint);
     }
 
     //<editor-fold defaultstate="collapsed" desc="IReferencePointContainer">
@@ -71,11 +71,11 @@ public class Laser implements IReferencePointContainer, Observer, ILaserOperator
     {
         try
         {
-            this.average.update(tim.getData());
+            this.dataMaskAverage.update(tim.getData());
         }
         catch (Exception ex)
         {
-            Logger.getLogger(Laser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger("Laser_Logger").fatal("Fault on updating data mask average. Message: " + ex.getMessage());
         }
     }
 //</editor-fold>
@@ -94,14 +94,32 @@ public class Laser implements IReferencePointContainer, Observer, ILaserOperator
     }
 
     @Override
-    public MeasDataSolidus getMeasurementData() throws Exception
+    public MeasDataSolidus getMeasurementData()
     {
         int startIdx = 90;
         int endIdx = 180;
 
-        boolean areaFree = collAera.checkArea(this.getCoordinatesData().getDistance(startIdx, endIdx));
-        int minDistance = (int) collAera.getClosestCoordToY(this.getCoordinatesData().getDistance(startIdx, endIdx)).getY();
-        
+        boolean areaFree = false;
+        int minDistance = 0;
+        try
+        {
+            areaFree = monitorArea.checkArea(this.getCoordinatesData().getDistance(startIdx, endIdx));
+            
+            Point temp = monitorArea.getClosestCoordToYInArea(this.getCoordinatesData().getDistance(startIdx, endIdx));
+            if(temp != null)
+            {
+                minDistance = (int)temp.getY();
+            }
+            else
+            {
+                minDistance = 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.getLogger("Laser_Logger").fatal("Fault when checking measurement results with the monitor area. Message: " + ex.getMessage());
+        }
+
         return new MeasDataSolidus(minDistance, areaFree);
     }
 

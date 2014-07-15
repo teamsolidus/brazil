@@ -1,4 +1,4 @@
-package Laser.Data;
+package environmentSensing.NewLaser.Data;
 
 
 /**
@@ -10,14 +10,17 @@ public class DataMaskAverage implements IDataProvider<Integer>
 
     //For Avarage
     private IDataProvider[] dataBuffer;
-    private int hysterese;
-    private int[] filteredData;
 
     public DataMaskAverage(int bufferSize)
     {
         dataBuffer = new IDataProvider[bufferSize];
-        this.hysterese = 50;
-        this.filteredData = new int[271];
+        
+        // Default fill the buffer (no null pointer)
+        for(int countFor = 0; countFor < this.dataBuffer.length; countFor++)
+        {
+            this.dataBuffer[countFor] = DummyProvider.getInstance();
+        }
+        DummyProvider.deletInstance();
     }
 
     private void addDataToBuffer(IDataProvider data)

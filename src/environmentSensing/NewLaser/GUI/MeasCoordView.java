@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
-package Laser.GUI;
+package environmentSensing.NewLaser.GUI;
 
-import Laser.References.ReferencePoint;
-import Laser.References.RelativeReferencePoint;
+import References.AReferencePoint;
+import References.ReferencePoint;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -34,9 +29,9 @@ public class MeasCoordView
      * @param scaleFactor
      * @param posY
      */
-    public MeasCoordView(ReferencePoint ref, int posX, int posY, int scaleFactor)
+    public MeasCoordView(AReferencePoint ref, int posX, int posY, int scaleFactor)
     {
-        this.ref = new RelativeReferencePoint(posX, posY, 0, ref);
+        this.ref = new ReferencePoint(posX, posY, 0, ref);
         
         this.sizeX = posX * 2;
         this.sizeY = 1000;
@@ -60,8 +55,8 @@ public class MeasCoordView
         {
             for (int countFor = 0; countFor < coord.length; countFor++)
             {
-                int refX = this.ref.getX(ReferencePoint.Type.ABSOLUTE);
-                int refY = this.ref.getY(ReferencePoint.Type.ABSOLUTE) * -1;//minus one for GUI
+                int refX = this.ref.getX();
+                int refY = this.ref.getY() * -1;//minus one for GUI
                 int tempX = (int)coord[countFor].getX()/ this.scaleFactor;
                 int tempY = ((int)coord[countFor].getY() * -1)/ this.scaleFactor;
 

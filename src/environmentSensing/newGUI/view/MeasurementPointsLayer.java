@@ -2,7 +2,7 @@
 package environmentSensing.newGUI.view;
 
 import References.view.GUIReference;
-import environmentSensing.NewLaser.LaserFactory;
+import environmentSensing.NewLaser.Solidus.LaserFactory;
 import environmentSensing.NewLaser.MeasuredResult;
 import environmentSensing.NewLaser.ReflectionPoint;
 import environmentSensing.positioning.positionEvaluation.IEnvironmentSensor;

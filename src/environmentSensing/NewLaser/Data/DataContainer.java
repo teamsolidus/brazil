@@ -1,8 +1,8 @@
 
-package Laser.Data;
+package environmentSensing.NewLaser.Data;
 
-import Laser.Interpretation.ICommandListener;
-import Laser.Interpretation.Command;
+import environmentSensing.NewLaser.Interpretation.Command;
+import environmentSensing.NewLaser.Interpretation.ICommandListener;
 import java.util.Observable;
 
 /**

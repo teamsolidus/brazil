@@ -1,9 +1,8 @@
 
-package Laser.CollisionControll;
+package environmentSensing.collisionDetection;
 
-import Laser.References.IReferencePointContainer;
-import Laser.References.ReferencePoint;
-import Laser.References.RelativeReferencePoint;
+import References.IReferencePointContainer;
+import References.ReferencePoint;
 import java.awt.Point;
 
 /**
@@ -18,9 +17,8 @@ public class MonitorArea implements IReferencePointContainer
     private int xLeft, xRight, yTop, yBottom;
     
     private ReferencePoint ref;
-    private ReferencePoint.Type type;
     
-    public MonitorArea(ReferencePoint ref, ReferencePoint.Type type)
+    public MonitorArea(ReferencePoint ref)
     {
         this.sizeX = 580;
         this.sizeY = 1250;
@@ -31,10 +29,14 @@ public class MonitorArea implements IReferencePointContainer
         this.yTop = this.sizeY/2;
         this.yBottom = this.yTop * -1;
         
-        this.ref = new RelativeReferencePoint(0, this.sizeY/2, 0, ref);
-        this.type = type;
+        this.ref = new ReferencePoint(0, this.sizeY/2, 0, ref);
     }
     
+    /**
+     * is one of the handed points in the area?
+     * @param coordinates
+     * @return 
+     */
     public boolean checkArea(Point[] coordinates)
     {
         for(Point p : coordinates)
@@ -47,12 +49,17 @@ public class MonitorArea implements IReferencePointContainer
         return false;
     }
     
+    /**
+     * Is the handed point in the area?
+     * @param coord
+     * @return 
+     */
     public boolean checkArea(Point coord)
     {
-        int tempXLeft = this.xLeft + this.ref.getX(type);
-        int tempXRight = this.xRight + this.ref.getX(type);
-        int tempYTop = this.yTop + this.ref.getY(type);
-        int tempYBottom = this.yBottom + this.ref.getY(type);
+        int tempXLeft = this.xLeft + this.ref.getX();
+        int tempXRight = this.xRight + this.ref.getX();
+        int tempYTop = this.yTop + this.ref.getY();
+        int tempYBottom = this.yBottom + this.ref.getY();
         
         if(coord.getX() < tempXRight && coord.getX() > tempXLeft)//Check: X in X limits
         {
@@ -65,6 +72,11 @@ public class MonitorArea implements IReferencePointContainer
         return false;
     }
     
+    /**
+     * returns the closest point to the ref point. No whether in the area or not.
+     * @param coordinates
+     * @return 
+     */
     public Point getClosestCoordToY(Point[] coordinates)
     {
         Point tempReturn = new Point(10000, 10000);
@@ -79,6 +91,30 @@ public class MonitorArea implements IReferencePointContainer
         
         return tempReturn;
     }
+    
+    public Point getClosestCoordToYInArea(Point[] coordinates)
+    {
+        Point tempReturn = null;
+        
+        for(Point p : coordinates)
+        {
+            if(this.checkArea(p))// is the point in the area?
+            {
+                if(tempReturn == null)
+                {
+                    tempReturn = new Point(p.x, p.y);
+                }
+                if(tempReturn.getY() > p.getY())
+                {
+                    tempReturn.setLocation(p.getX(), p.getY());
+                }
+            }
+        }
+        
+        return tempReturn;
+    }
+    
+    
 
     @Override
     public ReferencePoint getReferencePoint()

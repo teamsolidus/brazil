@@ -1,7 +1,7 @@
 
-package Laser.Data;
+package environmentSensing.NewLaser.Data;
 
-import Laser.References.ReferencePoint;
+import References.ReferencePoint;
 import java.awt.Point;
 
 /**
@@ -12,13 +12,11 @@ public class DataMaskCoordinates implements IDataProvider<Point>
 {
     private IDataProvider<Integer> data;
     private ReferencePoint ref;
-    private ReferencePoint.Type refType;
     
-    public DataMaskCoordinates(IDataProvider<Integer> data, ReferencePoint ref, ReferencePoint.Type refType)
+    public DataMaskCoordinates(IDataProvider<Integer> data, ReferencePoint ref)
     {
         this.data = data;
         this.ref = ref;
-        this.refType = refType;
     }
     
     @Override
@@ -75,7 +73,7 @@ public class DataMaskCoordinates implements IDataProvider<Point>
     private int calculateX(int index) throws Exception
     {
         int tempAngle = this.alphaCalculator(index);
-        double tempReturn = (Math.cos(Math.toRadians(tempAngle)) * data.getDistance(index)) + this.ref.getX(refType);
+        double tempReturn = (Math.cos(Math.toRadians(tempAngle)) * data.getDistance(index)) + this.ref.getX();
         return (int)tempReturn;
     }
     
@@ -89,7 +87,7 @@ public class DataMaskCoordinates implements IDataProvider<Point>
     private int calculateY(int index) throws Exception
     {
         int tempAngle = this.alphaCalculator(index);
-        double tempReturn = (Math.sin(Math.toRadians(tempAngle)) * data.getDistance(index)) + this.ref.getY(refType);
+        double tempReturn = (Math.sin(Math.toRadians(tempAngle)) * data.getDistance(index)) + this.ref.getY();
         return (int)tempReturn;
     }
     
@@ -103,7 +101,7 @@ public class DataMaskCoordinates implements IDataProvider<Point>
      */
     private int alphaCalculator(int index)
     {
-        int temp = (data.getStartAngle() + (data.getSteps() * index)) + this.ref.getAngle(this.refType);
+        int temp = (data.getStartAngle() + (data.getSteps() * index)) + this.ref.getAngle();
         return temp;
     }
 

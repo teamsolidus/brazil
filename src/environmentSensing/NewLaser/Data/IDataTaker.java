@@ -1,4 +1,4 @@
-package Laser.Data;
+package environmentSensing.NewLaser.Data;
 
 /**
  *

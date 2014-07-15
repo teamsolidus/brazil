@@ -1,9 +1,9 @@
 
-package Laser.Operation;
+package environmentSensing.NewLaser.Operation;
 
-import Laser.Interpretation.Command;
-import Laser.Communication.IComWriter;
-import Laser.Interpretation.ICommandListener;
+import environmentSensing.NewLaser.Communication.IComWriter;
+import environmentSensing.NewLaser.Interpretation.Command;
+import environmentSensing.NewLaser.Interpretation.ICommandListener;
 import java.io.IOException;
 
 /**

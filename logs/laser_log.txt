@@ -1,5 +1,0 @@
-DEBUG - Meine Debug-Meldung
-INFO - Meine Info-Meldung
-WARN - Meine Warn-Meldung
-ERROR - Meine Error-Meldung
-FATAL - Meine Fatal-Meldung

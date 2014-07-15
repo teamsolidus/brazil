@@ -1,8 +1,8 @@
 
-package Laser.GUI;
+package environmentSensing.NewLaser.GUI;
 
-import Laser.References.ReferencePoint;
-import Laser.References.RelativeReferencePoint;
+import References.AReferencePoint;
+import References.ReferencePoint;
 import java.awt.Color;
 import java.awt.Graphics;
 
@@ -23,9 +23,9 @@ public class CollisionAreaView
      * @param scaleFactor
      * @param posY
      */
-    public CollisionAreaView(ReferencePoint ref, int posX, int posY, int scaleFactor)
+    public CollisionAreaView(AReferencePoint ref, int posX, int posY, int scaleFactor)
     {
-        this.ref = new RelativeReferencePoint(posX, posY, 0, ref);
+        this.ref = new ReferencePoint(posX, posY, 0, ref);
         
         this.sizeX = 580;
         this.sizeY = 1250;
@@ -33,11 +33,11 @@ public class CollisionAreaView
         this.scaledSizeX = sizeX/scaleFactor;
         this.scaledSizeY = sizeY/scaleFactor;
         
-        int testerX = this.ref.getX(ReferencePoint.Type.ABSOLUTE);
-        int testerY = this.ref.getY(ReferencePoint.Type.ABSOLUTE);
+        int testerX = this.ref.getX();
+        int testerY = this.ref.getY();
         
-        this.xToRef = this.ref.getX(ReferencePoint.Type.ABSOLUTE) - scaledSizeX/2;
-        this.yToRef = ((this.ref.getY(ReferencePoint.Type.ABSOLUTE)*-1) - scaledSizeY );
+        this.xToRef = this.ref.getX() - scaledSizeX/2;
+        this.yToRef = ((this.ref.getY()*-1) - scaledSizeY );
         
         this.color = Color.BLUE;
     }

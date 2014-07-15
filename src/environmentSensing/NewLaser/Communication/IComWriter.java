@@ -1,5 +1,5 @@
 
-package Laser.Communication;
+package environmentSensing.NewLaser.Communication;
 
 import java.io.IOException;
 

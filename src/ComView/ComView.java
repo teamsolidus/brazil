@@ -12,7 +12,6 @@ import MainPack.Main;
 import java.net.DatagramSocket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import Traveling.LaserControlledBreaking;
 import java.io.IOException;
 
 public class ComView extends Thread

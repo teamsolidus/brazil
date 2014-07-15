@@ -1,7 +1,7 @@
-package Laser.GUI;
+package environmentSensing.NewLaser.GUI;
 
-import Laser.Solidus.Laser;
-import Laser.Solidus.ILaserOperatorSolidus;
+import environmentSensing.NewLaser.Solidus.ILaserOperatorSolidus;
+import environmentSensing.NewLaser.Solidus.Laser;
 import java.awt.Color;
 import java.util.Observable;
 import java.util.Observer;

@@ -1,6 +1,6 @@
-package Laser.GUI;
+package environmentSensing.NewLaser.GUI;
 
-import Laser.References.MainReferencePoint;
+import References.AbsoluteReferencePoint;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Panel;
@@ -36,8 +36,8 @@ public class FieldMonitorView extends Panel
         this.diameter = 3;
         this.scaleFactor = 2;
         
-        this.collisionArea = new CollisionAreaView(MainReferencePoint.getInstance(), 500, -1000, 10);
-        this.coord = new MeasCoordView(MainReferencePoint.getInstance(), 500, -1000, 10);
+        this.collisionArea = new CollisionAreaView(AbsoluteReferencePoint.getInstance(), 500, -1000, 10);
+        this.coord = new MeasCoordView(AbsoluteReferencePoint.getInstance(), 500, -1000, 10);
         
         this.closestToYValue = 10000;
     }

@@ -1,8 +1,8 @@
 
-package Laser.Solidus;
+package environmentSensing.NewLaser.Solidus;
 
-import Laser.GUI.Controller;
-import Laser.GUI.View;
+import environmentSensing.NewLaser.GUI.Controller;
+import environmentSensing.NewLaser.GUI.View;
 import java.awt.Color;
 import java.util.Observable;
 import java.util.Observer;
@@ -17,6 +17,7 @@ public class GUIControllerSolidus implements Observer
     public GUIControllerSolidus(Laser tim)
     {
         this.tim = tim;
+        this.view = new View();
     }
 
     @Override

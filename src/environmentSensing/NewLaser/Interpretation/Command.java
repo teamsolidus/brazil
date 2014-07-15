@@ -1,8 +1,9 @@
 
-package Laser.Interpretation;
+package environmentSensing.NewLaser.Interpretation;
 
-import Laser.Data.Data;
-import Laser.Data.IDataTaker;
+import Laser.Interpretation.ECommand;
+import environmentSensing.NewLaser.Data.Data;
+import environmentSensing.NewLaser.Data.IDataTaker;
 
 /**
  *

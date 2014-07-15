@@ -1,6 +1,5 @@
-package Laser.Communication;
+package environmentSensing.NewLaser.Communication;
 
-import Laser.Interpretation.ICommandListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,6 +39,7 @@ public class Communication implements IComReader, IComWriter
         
         this.receiver = new Receiver(response, listener);
         this.thread = new Thread(this.receiver);
+        this.thread.setName("Laser_Communication_Thread");
         this.thread.start();
     }
     

@@ -1,5 +1,7 @@
 
-package Laser.Interpretation;
+package environmentSensing.NewLaser.Interpretation;
+
+import Laser.Interpretation.ECommand;
 
 /**
  * Bestätigung der Anforderung continuous scan

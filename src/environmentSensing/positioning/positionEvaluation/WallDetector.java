@@ -2,7 +2,7 @@ package environmentSensing.positioning.positionEvaluation;
 
 import References.AReferencePoint;
 import References.ReferencePoint;
-import environmentSensing.NewLaser.LaserFactory;
+import environmentSensing.NewLaser.Solidus.LaserFactory;
 import environmentSensing.NewLaser.MeasuredResult;
 import environmentSensing.NewLaser.ReflectionPoint;
 import environmentSensing.positioning.positionEvaluation.dummyScenarios.Scenario1;

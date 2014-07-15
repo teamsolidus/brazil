@@ -1,25 +1,26 @@
 
-package Laser.TiM;
+package environmentSensing.NewLaser.TiM;
 
-import Laser.Communication.Communication;
-import Laser.Communication.IComWriter;
-import Laser.Data.DataContainer;
-import Laser.Data.DataMaskBasic;
-import Laser.Data.IDataContainer;
-import Laser.Data.IDataProvider;
-import Laser.Interpretation.BasicInterpreter;
-import Laser.Interpretation.ICommandListener;
-import Laser.Operation.IOperator;
-import Laser.Operation.Operator;
+import environmentSensing.NewLaser.Communication.Communication;
+import environmentSensing.NewLaser.Communication.IComWriter;
+import environmentSensing.NewLaser.Data.DataContainer;
+import environmentSensing.NewLaser.Data.DataMaskBasic;
+import environmentSensing.NewLaser.Data.IDataContainer;
+import environmentSensing.NewLaser.Data.IDataProvider;
+import environmentSensing.NewLaser.Interpretation.BasicInterpreter;
+import environmentSensing.NewLaser.Interpretation.ICommandListener;
+import environmentSensing.NewLaser.Operation.IOperator;
+import environmentSensing.NewLaser.Operation.Operator;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * @author simon.buehlmann
  */
-public class TiM55x implements Observer
+public class TiM55x implements Observer, ILaserscanner
 {
     private boolean wait;
     
@@ -27,9 +28,14 @@ public class TiM55x implements Observer
     private IDataContainer container;
     private IComWriter com;
     private BasicInterpreter interpreter;
+
+    //Logging
+    private Logger log;
     
     public TiM55x() throws IOException
     {
+        Logger.getLogger("Laser_Logger").info("Initialize TiM55x");
+        
         container = new DataContainer();
         interpreter = new BasicInterpreter((ICommandListener) container);
         com = new Communication("192.168.2.2", 2112, interpreter);
@@ -40,36 +46,41 @@ public class TiM55x implements Observer
         this.addObserver(this);
     }
     
+    @Override
     public IDataProvider<Integer> synchRunSingleMeas() throws Exception
     {
         operator.runSingleMeasurement();
-        synchronized(this)
+        synchronized (this)
         {
             this.wait = true;
             do
             {
                 this.wait();
             }
-            while(this.wait);
+            while (this.wait);
         }
         return this.getData();
     }
     
-    public void asynchRundSingleMeas() throws Exception
+    @Override
+    public void asynchRunSingleMeas() throws Exception
     {
         operator.runSingleMeasurement();
     }
     
+    @Override
     public void startContinuousMeas() throws Exception
     {
         operator.startContinouousMeasurement();
     }
     
+    @Override
     public void stopContinuousMeas() throws Exception
     {
         operator.stopContinuousMeasurement();
     }
     
+    @Override
     public IDataProvider<Integer> getData() throws Exception
     {
         return new DataMaskBasic(container.getMeasurementData());
@@ -77,14 +88,14 @@ public class TiM55x implements Observer
     
     public void addObserver(Observer obs)
     {
-        ((Observable)container).addObserver(obs);
+        ((Observable) container).addObserver(obs);
     }
 
     //<editor-fold defaultstate="collapsed" desc="Observer">
     @Override
     public void update(Observable o, Object arg)
     {
-        synchronized(this)
+        synchronized (this)
         {
             this.wait = false;
             this.notify();

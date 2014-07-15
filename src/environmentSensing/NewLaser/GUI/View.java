@@ -1,5 +1,5 @@
 
-package Laser.GUI;
+package environmentSensing.NewLaser.GUI;
 
 import java.awt.Color;
 import java.awt.Frame;

@@ -1,7 +1,6 @@
 
-package Laser.References;
+package References;
 
-import Laser.References.ReferencePoint;
 
 /**
  *
