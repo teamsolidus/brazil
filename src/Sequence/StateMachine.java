@@ -390,7 +390,7 @@ public class StateMachine extends Thread
                     break;
 
                 case "TO_PUCK_AREA":
-                    //if (roboAtPucks)
+                    //if (!roboAtPucks)
                     //{
                     comView.setStation(0);
                     drive.setEndTarget(way.getPuckCell());
@@ -471,7 +471,7 @@ public class StateMachine extends Thread
 
                 case "TO_DELIVERY":
                     Main.log.debug("************* STEP TO_DELIVERY * " + way.getDeliveryCell() + "****************");
-                    //if (roboAtPucks)
+                    //if (!roboAtPucks)
                     //{
                     drive.setEndTarget(way.getDeliveryCell());
                     drive.takeNext = true;
@@ -658,6 +658,9 @@ public class StateMachine extends Thread
 
                 drive.setStartCell(way.getStartCell());
                 drive.setStartPosPhi(180);
+                comView.setStation(0);
+                //******************* DAVON AUSGEGANGEN ES WIRD VON 180° GESTARTET UND IN X AUF EINER ZELLENMITTE *************************
+                comView.setKoords(way.getStartCell().getRealY() - way.getStartKoordY(), 0, 0);
 
                 switch (prodMaint)
                 {
@@ -737,7 +740,14 @@ public class StateMachine extends Thread
                                 break;
 
                         }
-                        prodMaint = "WAIT_INITIAL_POSITION";
+                        nextStep = "WAIT_INITIAL_POSITION";
+                        prodMaint = "WAIT_ROBOVIEW";
+                        break;
+
+                    case "WAIT_VIEW":
+
+                        waitRoboView();
+
                         break;
 
                     case "WAIT_INITIAL_POSITION":
