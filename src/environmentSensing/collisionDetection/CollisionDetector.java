@@ -97,7 +97,7 @@ public class CollisionDetector implements ICollisionDetection, Observer
         }
         
         // DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        System.out.println("Min. Distance: " + this.lastMeasData.getMinDistance());
-        System.out.println("Speed: " + this.evaluateSpeedPercent() + "%");
+        //System.out.println("Min. Distance: " + this.lastMeasData.getMinDistance());
+        //System.out.println("Speed: " + this.evaluateSpeedPercent() + "%");
     }
 }
