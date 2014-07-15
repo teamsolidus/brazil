@@ -92,7 +92,14 @@ public class Drive extends Thread
             // fc.setRoboPos(Main.getJerseyNr(),xAbsolut, yAbsolut, 1);
             if ((avoid || fc.avoidTest) && !avoidStart)
             {
-
+                ///////// WENN GEWISSE ZEIT ABGELAUFEN ---> geh in AVOID STEP //////////////////
+                
+                // --> evtl stopuhr benutzen ( wenn faktor genug lange 0 ist dann ausweichen)
+                
+                
+                
+                
+                
                 step = "AVOID";
             }
 
@@ -129,10 +136,6 @@ public class Drive extends Thread
                     printCellX = startCellX;
                     printCellY = startCellY;
 
-                    if (startCellX == 0)
-                    {
-                        firstY = true;
-                    }
 
                     endTargetX = this.endCell.getX();
                     endTargetY = this.endCell.getY();
@@ -141,6 +144,12 @@ public class Drive extends Thread
                     deltaCellsX = endCell.getX() - startCell.getX();
                     deltaCellsY = endCell.getY() - startCell.getY();
 
+                    
+                    if (startCellX == 0 || endTargetX == 0)
+                    {
+                        firstY = true;
+                    }
+                    
                     //   beginning = false;
                     step = "START";
                 }
@@ -152,7 +161,7 @@ public class Drive extends Thread
                     step = "ROTATE_Y";
 
                 }
-                if ((((startCellY % 2) != 0) || endTargetY == 0 || startCellY == 0 || endTargetX == 0) && !firstY)
+                if ((((startCellY % 2) != 0) || endTargetY == 0 || startCellY == 0) && !firstY)
                 {
                     step = "ROTATE_X";
 
@@ -1016,8 +1025,8 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(9, 1);
-        drive.setEndTarget(5, 2);
+        drive.setStartCell(1, 1);
+        drive.setEndTarget(0, 7);
         drive.setStartPosPhi(180);
 
         drive.start();
