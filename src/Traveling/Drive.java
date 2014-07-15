@@ -13,6 +13,7 @@ import References.AbsoluteReferencePoint;
 import References.ReferencePoint;
 import Sequence.JobController;
 import Sequence.StateMachine;
+import environmentSensing.collisionDetection.CollisionDetector;
 import environmentSensing.positioning.OptimizationPosition;
 import java.awt.AWTException;
 import java.util.logging.Level;
@@ -57,13 +58,15 @@ public class Drive extends Thread
     int turnPhi;
     String step = "INIT";
     String avoidStep;
-    boolean firstY, drivingX, drivingY;
+    boolean firstY, drivingX, drivingY, breakingAllowed, toPuck, toDelivery, toWaitCell;
 
     FieldCommander fc;
     ComView comView;
     OptimizationPosition pos;
+    JobController job;
     private static Drive instance = null;
     StateMachine sM;
+    CollisionDetector coll;
 
     public static Drive getInstance() throws AWTException
     {
@@ -79,15 +82,29 @@ public class Drive extends Thread
 
         this.comView = ComView.getInstance();
         this.fc = FieldCommander.getInstance();
-
+        this.job = JobController.getInstance();
         this.sM = StateMachine.getInstance();
         pos = new OptimizationPosition();
+    // this.coll= CollisionDetector.getInstance();
+        
+        
     }
 
     public void run()
     {
         while (running)
-        {
+        {   
+            
+            
+            /*if (breakingAllowed)
+            {
+             comView.breakingFactor = coll.evaluateSpeedPercent();
+ 
+            } 
+         else if ()
+            {
+               
+            }*/
 
             // fc.setRoboPos(Main.getJerseyNr(),xAbsolut, yAbsolut, 1);
             if ((avoid || fc.avoidTest) && !avoidStart)
@@ -145,9 +162,29 @@ public class Drive extends Thread
                     deltaCellsY = endCell.getY() - startCell.getY();
 
                     
-                    if (startCellX == 0 || endTargetX == 0)
+                    if (((startCellX % 2) != 0 && endTargetX == 0 ) ||
+                        ((startCellX % 2) != 0 && endTargetY == 0 )||
+                            startCellX==0 ||
+                       ( startCellX % 2 != 0 && deltaY != 0 )  ||
+                        (startCellX%2 == 0 || startCellY%2 == 0)
+                      )
                     {
                         firstY = true;
+                    }
+                    
+                    if (endCell == job.getPuckCell())
+                    {
+                        toPuck =true;
+                    }
+                    if (endCell == job.getDeliveryCell())
+                    {
+                        toDelivery =true;
+                    }
+                    
+                    if (endCell == job.getWaitCellBlond())
+                    {
+                        
+                        toWaitCell = true;
                     }
                     
                     //   beginning = false;
@@ -156,18 +193,18 @@ public class Drive extends Thread
                 break;
             case "START":
 
-                if (((startCellX % 2) != 0) && deltaY != 0 || startCellX == 0)
+                if ( firstY)
                 {
                     step = "ROTATE_Y";
 
                 }
-                if ((((startCellY % 2) != 0) || endTargetY == 0 || startCellY == 0) && !firstY)
+               else if (((startCellY % 2) != 0) || (startCellY < 2) || (startCellX<2))
                 {
                     step = "ROTATE_X";
 
                 }
 
-                if (endTargetX == startCellX && endTargetY == startCellY)
+              if (endTargetX == startCellX && endTargetY == startCellY)
                 {
 
                     step = "TURN_TO_MACHINE";
@@ -388,13 +425,19 @@ public class Drive extends Thread
                 {
                     step = "NOT_ON_MACHINE_Y";
                 }
+                
+                if (toDelivery || toPuck || toWaitCell)
+                {
+                    
+                    step ="NOT_ON_MACHINE_Y";
+                }
 
                 break;
 
             case "ON_MACHINE_Y":
                 onMachine = true;
 
-                if ((startCellX == endTargetX) || (startCellX == 1 && endTargetX == 0)) // wenn das Ziel Y auf der gleichen Höhe wie das start Y ist
+                if ((startCellX == endTargetX)) // wenn das Ziel Y auf der gleichen Höhe wie das start Y ist
                 {
                     startCellY = startCellY + deltaCellsY;
                     step = "DRIVE_Y";
@@ -1027,9 +1070,9 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(7, 6);
-        drive.setEndTarget(9, 4);
-        drive.setStartPosPhi(270);
+        drive.setStartCell(2, 3);
+        drive.setEndTarget(6, 0);
+        drive.setStartPosPhi(90);
 
         drive.start();
     }
