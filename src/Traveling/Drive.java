@@ -406,7 +406,7 @@ public class Drive extends Thread
                     {
                         startCellY = startCellY + deltaCellsY + 1;
                     }
-                    if (deltaCellsY > 0 && !firstY) // else
+                    if (deltaCellsY > 0 && !firstY || (endTargetX % 2 !=0 && deltaCellsY<0)) // else
                     {
 
                         startCellY = startCellY + deltaCellsY - 1;
@@ -713,6 +713,7 @@ public class Drive extends Thread
                     {
                         rotate("E");
                         startCellX = startCellX + 2;
+                        
                         // wenn über 5te y zelle hinaus darf er nicht mehr nach unten ausweichen sondern muss nach oben
                     } else
                     {
@@ -735,6 +736,7 @@ public class Drive extends Thread
             case "CHANGE_WAY":
 
                 comView.setKoords(2 * FIELDSIZE, 0, 0);
+                
 
                 // verschieb dich zum zwei felder z.b von da an danach neuen weg evaluieren und wieder probieren
                 nextStep = "TO_FINAL";
@@ -748,10 +750,7 @@ public class Drive extends Thread
                 avoid = false;
                 fc.avoidTest = false;
                 avoidStart = false;
-                if (avoidY)
-                {
-                    // ob von oben oder unten heranfahren muss -2 oder -1 sein. (bzw +2 od +1)
-                }
+             
 
                 //**************************** WENNN ICH IN Y AUSWEICHE DANN AUCH ZUERST IN Y FAHREN NICHT IN X ****************************************
                 setEndTarget(finalTarget); // load old job from the last try and calculate the new way from the new startpositon
@@ -913,15 +912,16 @@ public class Drive extends Thread
 
             if (startCellsX[countX - 1] >= endTargetX)
             {
-                xAbsolut = oldX - comView.getxAktuell();
+                xAbsolut = oldX + comView.getxAktuell();
 
             } else
             {
-                xAbsolut = oldX + comView.getxAktuell();
+                xAbsolut = oldX - comView.getxAktuell();
             }
-
-            //  System.out.println("X: " + xAbsolut);
+               System.out.println("X "+ xAbsolut);
+              System.out.println("Y: " + oldY);
         }
+    
         if (drivingY)
         {
             if (startCellsY[countY - 1] >= endTargetY)
@@ -932,7 +932,9 @@ public class Drive extends Thread
             {
                 yAbsolut = oldY + comView.getxAktuell();
             }
-            //System.out.println("Y:" + yAbsolut);
+        
+            System.out.println("X "+ oldX);
+              System.out.println("Y: " + yAbsolut);
         }
     }
 
@@ -1025,9 +1027,9 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(1, 1);
-        drive.setEndTarget(0, 7);
-        drive.setStartPosPhi(180);
+        drive.setStartCell(7, 6);
+        drive.setEndTarget(9, 4);
+        drive.setStartPosPhi(270);
 
         drive.start();
     }
