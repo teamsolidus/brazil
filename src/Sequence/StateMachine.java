@@ -795,6 +795,8 @@ public class StateMachine extends Thread
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
                         //}
+                        //else
+                        //{}
                         break;
 
                     case "CATCH":
@@ -1115,7 +1117,6 @@ public class StateMachine extends Thread
                         Main.log.debug("************* BACK_FROM_RIGHT_SIDE *****************");
                         comView.setStation(0);
                         comView.setKoords(-80 - BACKWAY, 150, 0);
-
                         nextStep = "TO_T1";
                         prodStep = "WAIT_ROBOVIEW";
 
@@ -1239,7 +1240,8 @@ public class StateMachine extends Thread
                     case "FINISH":
                         Main.log.debug("************* STEP FINISH *****************");
                         deliveryCount = 0;
-                        prodCount = 9;
+                        prodCount = 8;
+                        prodFinalStep = false;
                         prodStep = "TO_PUCK_AREA";
                         break;
 
