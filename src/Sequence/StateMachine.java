@@ -1377,7 +1377,7 @@ public class StateMachine extends Thread
                                     break;
 
                             }
-                            mtc.maintenanceWrite(this, "stateMachine.dat");
+                            mtc.maintenanceWrite(StateMachine.getInstance(), "stateMachine.dat");
 
                         }
                         break;
