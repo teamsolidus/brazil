@@ -83,7 +83,7 @@ public class Drive extends Thread
         this.comView = ComView.getInstance();
         this.fc = FieldCommander.getInstance();
         this.job = JobController.getInstance();
-        this.sM = StateMachine.getInstance();
+      
         pos = new OptimizationPosition();
         // this.coll= CollisionDetector.getInstance();
 
@@ -94,11 +94,11 @@ public class Drive extends Thread
         while (running)
         {
 
-            if (breakingAllowed && !sM.paused)
+            if (breakingAllowed)
             {
-                comView.breakingFactor = coll.evaluateSpeedPercent();
+                //comView.breakingFactor = coll.evaluateSpeedPercent();
 
-            } else if (!sM.paused)
+            } else
             {
                 comView.breakingFactor = 100;
             }
@@ -186,7 +186,7 @@ public class Drive extends Thread
                 {
                     step = "ROTATE_Y";
 
-                } else if (((startCellY % 2) != 0) || (startCellY < 2) || (startCellX < 2))
+                } else if (((startCellY % 2) != 0) || (startCellY < 2) || (startCellX < 2)|| startCellY==8)
                 {
                     step = "ROTATE_X";
 
@@ -418,10 +418,11 @@ public class Drive extends Thread
             case "ON_MACHINE_Y":
                 onMachine = true;
 
-                if ((startCellX == endTargetX)) // wenn das Ziel Y auf der gleichen Höhe wie das start Y ist
+                if (startCellX == endTargetX ||( startCellX%2!=0 && endTargetY == 8)) // wenn das Ziel Y auf der gleichen Höhe wie das start Y ist
                 {
                     startCellY = startCellY + deltaCellsY;
                     step = "DRIVE_Y";
+                    onMachine=false;
                 } else if (startCellY != endTargetY)
                 {
                     // wenn Y nicht auf gleicher Höhe
@@ -438,6 +439,9 @@ public class Drive extends Thread
 
                     if (firstY)
                     {
+                    
+                        
+                        
                         if (deltaCellsY < 0)
                         {
                             startCellY = startCellY + deltaCellsY - 1;
@@ -447,6 +451,7 @@ public class Drive extends Thread
 
                             startCellY = startCellY + deltaCellsY + 1;
                         }
+                        
 
                     }
 
@@ -1067,9 +1072,9 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(3, 8);
-        drive.setEndTarget(0, 4);
-        drive.setStartPosPhi(180);
+        drive.setStartCell(7, 6);
+        drive.setEndTarget(4, 5);
+        drive.setStartPosPhi(270);
 
         drive.start();
 

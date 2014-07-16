@@ -1068,7 +1068,7 @@ public class StateMachine extends Thread
                     case "MOVE_LEFT_SIDE_A":
                         Main.log.debug("************* MOVE_LEFT_SIDE_A *****************");
                         comView.setStation(0);
-                        comView.setKoords(0, 150, 0);
+                        comView.setKoords(0, 180, 0);
                         nextStep = "MOVE_LEFT_SIDE_B";
                         prodStep = "WAIT_ROBOVIEW";
                         break;
@@ -1077,14 +1077,14 @@ public class StateMachine extends Thread
                         Main.log.debug("************* MOVE_LEFT_SIDE_B *****************");
                         comView.setStation(0);
                         comView.setKoords(80, 0, 0);
-                        nextStep = "BACK_FROM_LEFT_SIDE";
+                        nextStep = "BACK_FROM_LEFT_SIDE_A";
                         prodStep = "WAIT_ROBOVIEW";
                         break;
 
                     case "MOVE_RIGHT_SIDE_A":
                         Main.log.debug("************* MOVE_RIGHT_SIDE_A *****************");
                         comView.setStation(0);
-                        comView.setKoords(0, -150, 0);
+                        comView.setKoords(0, -180, 0);
                         nextStep = "MOVE_RIGHT_SIDE_B";
                         prodStep = "WAIT_ROBOVIEW";
                         break;
@@ -1093,14 +1093,23 @@ public class StateMachine extends Thread
                         Main.log.debug("************* MOVE_RIGHT_SIDE_B *****************");
                         comView.setStation(0);
                         comView.setKoords(80, 0, 0);
-                        nextStep = "BACK_FROM_RIGHT_SIDE";
+                        nextStep = "BACK_FROM_RIGHT_SIDE_A";
                         prodStep = "WAIT_ROBOVIEW";
                         break;
+                        
+                        case "BACK_FROM_LEFT_SIDE_A":
+                        Main.log.debug("************* BACK_FROM_RIGHT_SIDE *****************");
+                        comView.setStation(0);
+                        comView.setKoords(-80 - BACKWAY, 0, 0);
+                        nextStep = "BACK_FROM_LEFT_SIDE_B";
+                        prodStep = "WAIT_ROBOVIEW";
 
-                    case "BACK_FROM_LEFT_SIDE":
+                        break;
+
+                    case "BACK_FROM_LEFT_SIDE_B":
                         Main.log.debug("************* BACK_FROM_LEFT_SIDE *****************");
                         comView.setStation(0);
-                        comView.setKoords(-80 - BACKWAY, -150, 0);
+                        comView.setKoords(0, -180, 0);
                         switch (prodCount)
                         {
                             case 4:
@@ -1115,10 +1124,19 @@ public class StateMachine extends Thread
                         }
                         break;
 
-                    case "BACK_FROM_RIGHT_SIDE":
+                        case "BACK_FROM_RIGHT_SIDE_A":
                         Main.log.debug("************* BACK_FROM_RIGHT_SIDE *****************");
                         comView.setStation(0);
-                        comView.setKoords(-80 - BACKWAY, 150, 0);
+                        comView.setKoords(-80 - BACKWAY, 0, 0);
+                        nextStep = "BACK_FROM_RIGHT_SIDE_B";
+                        prodStep = "WAIT_ROBOVIEW";
+
+                        break;
+                            
+                    case "BACK_FROM_RIGHT_SIDE_B":
+                        Main.log.debug("************* BACK_FROM_RIGHT_SIDE *****************");
+                        comView.setStation(0);
+                        comView.setKoords(0, 180, 0);
                         nextStep = "TO_T1";
                         prodStep = "WAIT_ROBOVIEW";
 
