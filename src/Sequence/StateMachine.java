@@ -49,7 +49,7 @@ public class StateMachine extends Thread
     private boolean prodFinalStep = false;
     private boolean firstProd = true;
     private boolean begin = true;
-    private boolean firstPause;
+    public boolean firstPause,paused;
     String nextStep;
     Maintenance mtc;
 
@@ -116,7 +116,7 @@ public class StateMachine extends Thread
                             {
                                 Logger.getLogger(StateMachine.class.getName()).log(Level.SEVERE, null, ex);
                             }
-
+                            paused=false;
                         }
 
                         firstPause = true;
@@ -125,6 +125,7 @@ public class StateMachine extends Thread
                     break;
                 case "PAUSED":
                     Main.log.info("PAUSED");
+                    paused=true;
                     if (!firstPause)
                     {
 
@@ -897,7 +898,7 @@ public class StateMachine extends Thread
                         Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                         comView.setStation(0);
 
-                        drive.setEndTarget(way.getWaitCellPink());
+                        drive.setEndTarget(way.getLoadCellNearMachine(way.getWaitCell()));
 
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
@@ -909,7 +910,8 @@ public class StateMachine extends Thread
                         Main.log.debug("************* STEP TO_WAITING_CELL_PINK *****************");
                         comView.setStation(0);
 
-                        drive.setEndTarget(way.getWaitCellBlond());
+                       
+                        drive.setEndTarget(way.getLoadCellNearMachine(way.getWaitCell()));
 
                         drive.takeNext = true;
                         prodStep = "WAIT_DRIVE";
