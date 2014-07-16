@@ -162,55 +162,52 @@ public class JobController implements Serializable
     return fc.cell[x][y];
   }
 
-  public static int[][] waitCellPink =
+  
+   // [Field Half][Robo][coord]  
+  public static String [][][] waitCell =
   {
     {
-      17, 8
+      //Pink
+      {
+        "W4" // has startCell 14/0
+      },
+      //Brown
+      {
+        "W5"  // has startCell 16/0
+      },
+      //Blond
+      {
+        "W6" // has startCell 18/0
+      },
     },
     {
-      1, 8
+      //Pink
+      {
+        "W1"  // has startCell 14/0
+      },
+      //Brown
+      {
+        "W2"// has startCell 16/0
+      },
+      //Blond
+      {
+       "W3" // has startCell 18/0
+      },
     }
+
   };
 
-  public Cell getWaitCellPink()
-  {
-    int x = waitCellPink[FIELDHALF][0];
-    int y = waitCellPink[FIELDHALF][1];
-    return fc.cell[x][y];
-  }
+ 
 
-  public static int[][] waitCellBlond =
-  {
-    {
-      11, 8
-    },
-    {
-      7, 8
-    }
-  };
 
-  public Cell getWaitCellBlond()
-  {
-    int x = waitCellBlond[FIELDHALF][0];
-    int y = waitCellBlond[FIELDHALF][1];
-    return fc.cell[x][y];
-  }
 
-  public static int[][] waitCellBrown =
-  {
-    {
-      15, 8
-    },
-    {
-      3, 8
-    }
-  };
 
-  public Cell getWaitCellBrown()
+
+  public String getWaitCell()
   {
-    int x = waitCellBrown[FIELDHALF][0];
-    int y = waitCellBrown[FIELDHALF][1];
-    return fc.cell[x][y];
+    String cell = waitCell[FIELDHALF][roboNameIdx][0];
+  
+    return cell;
   }
 
   public int getStartKoordX()
