@@ -995,7 +995,7 @@ public class StateMachine extends Thread
                     case "PUCK_TAKEN_A":
                         Main.log.debug("************* PUCK_TAKEN_A *****************");
                         comView.setStation(0);
-                        comView.setKoords(0, 150, 0);
+                        comView.setKoords(0, 180, 0);
                         nextStep = "PUCK_TAKEN_B";
                         prodStep = "WAIT_ROBOVIEW";
                         break;
@@ -1011,7 +1011,7 @@ public class StateMachine extends Thread
                     case "PUCK_TAKEN_C":
                         Main.log.debug("************* PUCK_TAKEN_C *****************");
                         comView.setStation(0);
-                        comView.setKoords(240, 150, 0);
+                        comView.setKoords(240, 180, 0);
                         switch (prodCount)
                         {
                             case 5:
