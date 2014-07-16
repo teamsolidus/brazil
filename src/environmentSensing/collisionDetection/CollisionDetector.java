@@ -21,8 +21,8 @@ public class CollisionDetector implements ICollisionDetection, Observer
     
     private CollisionDetector()
     {
-        this.FULL_SPEED_LIMIT = 1000;
-        this.STOP_LIMIT = 20;
+        this.FULL_SPEED_LIMIT = 1250;
+        this.STOP_LIMIT = 300;
         this.FULL_SPEED_VALUE = 100;
         this.STOP_VALUE = 0;
         
@@ -81,7 +81,7 @@ public class CollisionDetector implements ICollisionDetection, Observer
         int deltaX = this.FULL_SPEED_LIMIT - this.STOP_LIMIT;
         double steigung = ((double)deltaY / (double)deltaX);
         
-        return (int)(steigung * this.lastMeasData.getMinDistance());
+        return (int)(steigung * (this.lastMeasData.getMinDistance() - this.STOP_LIMIT));
     }
 
     @Override

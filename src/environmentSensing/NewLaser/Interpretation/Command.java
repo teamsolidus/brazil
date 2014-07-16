@@ -1,7 +1,6 @@
 
 package environmentSensing.NewLaser.Interpretation;
 
-import Laser.Interpretation.ECommand;
 import environmentSensing.NewLaser.Data.Data;
 import environmentSensing.NewLaser.Data.IDataTaker;
 

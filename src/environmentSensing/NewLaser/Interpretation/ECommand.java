@@ -1,5 +1,5 @@
 
-package Laser.Interpretation;
+package environmentSensing.NewLaser.Interpretation;
 
 /**
  *

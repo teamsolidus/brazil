@@ -1,8 +1,6 @@
 
 package environmentSensing.NewLaser.Interpretation;
 
-import Laser.Interpretation.ECommand;
-
 /**
  * Antwort single scan
  * @author simon.buehlmann
