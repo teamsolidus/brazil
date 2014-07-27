@@ -1,5 +1,5 @@
 
-package environmentSensing.positioning.positionEvaluation;
+package environmentSensing.positioning.positionEvaluation.wall;
 
 import References.AReferencePoint;
 import java.awt.Point;

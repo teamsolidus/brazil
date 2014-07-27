@@ -1,8 +1,5 @@
-package environmentSensing.positioning.positionEvaluation;
+package environmentSensing.positioning.positionEvaluation.wall;
 
-import References.AReferencePoint;
-import References.ReferencePoint;
-import environmentSensing.NewLaser.ReflectionPoint;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +12,6 @@ import java.util.logging.Logger;
  */
 public class Wall
 {
-
-    private AReferencePoint reference;
-
     //Lines
     private StraightLine mainLine;
     private StraightLine outerTolLine;
@@ -31,19 +25,17 @@ public class Wall
     private int minSuccessivePoints;
 
     //ReflectionPoints
-    private List<ReflectionPoint> associatedPoints;
+    private List<Point> associatedPoints;
 
-    public Wall(AReferencePoint reference, ReflectionPoint pointA, ReflectionPoint pointB)
+    public Wall(Point pointA, Point pointB)
     {
         //Define tolerances
         this.symetricTol = 50;
         this.rssiTol = 5;
         this.minSuccessivePoints = 3;
-        
-        this.reference = reference;
 
         //Generate lines
-        this.mainLine = new StraightLine(reference, pointA.getPosition(), pointB.getPosition());
+        this.mainLine = new StraightLine(pointA, pointB);
         this.controllLine = new StraightLine();
         this.calculateTolerances();
 
@@ -51,18 +43,18 @@ public class Wall
         this.associatedPoints = new ArrayList();
     }
 
-    public boolean reflectionPointBelongsToWall(ReflectionPoint reflectionPoint)
+    public boolean reflectionPointBelongsToWall(Point reflectionPoint)
     {
         //In Future: Check RSSI Tolerance
 
         //Check the position
-        return this.pointBelongsToFunction(reflectionPoint.getPosition());
+        return this.pointBelongsToFunction(reflectionPoint);
     }
 
-    public void addReflectionPoint(ReflectionPoint reflectionPoint)
+    public void addReflectionPoint(Point reflectionPoint)
     {
         this.associatedPoints.add(reflectionPoint);
-        this.correctDifferations(reflectionPoint.getPosition());
+        this.correctDifferations(reflectionPoint);
     }
 
     public boolean enoughDefinitionPoints()
@@ -150,7 +142,7 @@ public class Wall
 
     private void correctDifferations(Point p)
     {
-        this.controllLine.defineLineWithTwoPoints(reference, this.mainLine.getBasePoint(), p);
+        this.controllLine.defineLineWithTwoPoints(this.mainLine.getBasePoint(), p);
         double angleDifferences = this.controllLine.getAngle() - this.mainLine.getAngle();
         this.mainLine.setAngle(this.mainLine.getAngle() + angleDifferences/2);
         this.calculateTolerances();
@@ -223,10 +215,10 @@ public class Wall
     }
     
     // Public Methods
-    public ReferencePoint checkIntersectionWithOtherWall(Wall other) throws Exception
+    public Point checkIntersectionWithOtherWall(Wall other) throws Exception
     {
         Point tempPoint = this.mainLine.intersection(other.getMainLine());
-        return new ReferencePoint(tempPoint.x, tempPoint.y, 0, this.reference);
+        return tempPoint;
     }
     
     /**
@@ -234,15 +226,15 @@ public class Wall
      * @param reflectionPoints
      * @return 
      */
-    public boolean validateWall(List<ReflectionPoint> reflectionPoints)
+    public boolean validateWall(Point[] reflectionPoints)
     {
         // Check
         // Step1: If the main line is horizontal, only the Y must be checked
         if (this.mainLine.getAngle() == 0)
         {
-            for(ReflectionPoint point : reflectionPoints)
+            for(Point point : reflectionPoints)
             {
-                if(point.getPosition().y > this.innerTolLine.getBasePoint().y)
+                if(point.y > this.innerTolLine.getBasePoint().y)
                 {
                     return false;
                 }
@@ -253,9 +245,9 @@ public class Wall
         // Step 2: If the main line is vertical, only the X must be checked
         if (this.mainLine.getAngle() == 90)
         {
-            for(ReflectionPoint point : reflectionPoints)
+            for(Point point : reflectionPoints)
             {
-                if(point.getPosition().x > this.innerTolLine.getBasePoint().x)
+                if(point.x > this.innerTolLine.getBasePoint().x)
                 {
                     return false;
                 }
@@ -270,10 +262,10 @@ public class Wall
         //If the Angle is >0 & <=45 or >= 135 & < 180 degrees, calculate with Y-Axis
         if (this.mainLine.getAngle() <= 45 && this.mainLine.getAngle() > 0 || this.mainLine.getAngle() >= 135 && this.mainLine.getAngle() < 180)
         {
-            for(ReflectionPoint point : reflectionPoints)
+            for(Point point : reflectionPoints)
             {
                 //Shift controllfunction to point
-                this.controllLine.setBasePoint(point.getPosition());
+                this.controllLine.setBasePoint(point);
                 
                 try
                 {
@@ -296,10 +288,10 @@ public class Wall
         //If the Angle is >45 and <135 degrees, calculate with X-Axis
         if (this.mainLine.getAngle() > 45 && this.mainLine.getAngle() < 180)
         {
-           for(ReflectionPoint point : reflectionPoints)
+           for(Point point : reflectionPoints)
             {
                 //Shift controllfunction to point
-                this.controllLine.setBasePoint(point.getPosition());
+                this.controllLine.setBasePoint(point);
                 
                 try
                 {

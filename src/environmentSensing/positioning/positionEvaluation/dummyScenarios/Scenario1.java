@@ -2,7 +2,7 @@
 package environmentSensing.positioning.positionEvaluation.dummyScenarios;
 
 import References.AbsoluteReferencePoint;
-import environmentSensing.NewLaser.MeasuredResult;
+import environmentSensing.positioning.positionEvaluation.IEnvironmentReflections;
 import environmentSensing.positioning.positionEvaluation.IEnvironmentSensor;
 import java.awt.Point;
 
@@ -14,11 +14,11 @@ public class Scenario1 implements IEnvironmentSensor
 {
     private static Scenario1 instance;
     
-    private MeasuredResult result;
+    //private MeasuredResult result;
     
     public Scenario1()
     {
-        result = new MeasuredResult(AbsoluteReferencePoint.getInstance());
+        /*result = new MeasuredResult(AbsoluteReferencePoint.getInstance());
         
         result.addReflectionPoint(new Point(0, 470), 0);
         result.addReflectionPoint(new Point(45, 470), 0);
@@ -39,7 +39,7 @@ public class Scenario1 implements IEnvironmentSensor
         result.addReflectionPoint(new Point(1225, 320), 0);
         result.addReflectionPoint(new Point(1245, 220), 0);
         result.addReflectionPoint(new Point(1260, 100), 0);
-        result.addReflectionPoint(new Point(1275, 0), 0);
+        result.addReflectionPoint(new Point(1275, 0), 0);*/
     }
     
     public static Scenario1 getInstance()
@@ -52,8 +52,9 @@ public class Scenario1 implements IEnvironmentSensor
     }
 
     @Override
-    public MeasuredResult getEnvironmentReflections()
+    public IEnvironmentReflections getEnvironmentReflections()
     {
-        return this.result;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 }

@@ -1,35 +1,30 @@
 
 package environmentSensing.collisionDetection;
 
-import References.IReferencePointContainer;
-import References.ReferencePoint;
+import References.AReferencePoint;
+import References.AbsoluteReferencePoint;
 import java.awt.Point;
 
 /**
  *
  * @author simon.buehlmann
  */
-public class MonitorArea implements IReferencePointContainer
+public class MonitorArea
 {
     private int sizeX, sizeY;
     
     //Limits
     private int xLeft, xRight, yTop, yBottom;
     
-    private ReferencePoint ref;
+    private AReferencePoint ref;
     
-    public MonitorArea(ReferencePoint ref)
+    public MonitorArea(int width, int lenght)
     {
-        this.sizeX = 580;
-        this.sizeY = 1250;
-        
         //Limit Coordinates Aaera
-        this.xRight = this.sizeX/2;
+        this.xRight = width/2;
         this.xLeft = this.xRight * -1;
-        this.yTop = this.sizeY/2;
-        this.yBottom = this.yTop * -1;
-        
-        this.ref = new ReferencePoint(0, this.sizeY/2, 0, ref);
+        this.yTop = lenght;
+        this.yBottom = 0;
     }
     
     /**
@@ -56,11 +51,11 @@ public class MonitorArea implements IReferencePointContainer
      */
     public boolean checkArea(Point coord)
     {
-        int tempXLeft = this.xLeft + this.ref.getX();
-        int tempXRight = this.xRight + this.ref.getX();
-        int tempYTop = this.yTop + this.ref.getY();
-        int tempYBottom = this.yBottom + this.ref.getY();
-        
+        int tempXLeft = this.xLeft;
+        int tempXRight = this.xRight;
+        int tempYTop = this.yTop;
+        int tempYBottom = this.yBottom;
+
         if(coord.getX() < tempXRight && coord.getX() > tempXLeft)//Check: X in X limits
         {
             if(coord.getY() > tempYBottom && coord.getY() < tempYTop)//Check: Y in Y limits
@@ -114,17 +109,13 @@ public class MonitorArea implements IReferencePointContainer
         return tempReturn;
     }
     
-    
-
-    @Override
-    public ReferencePoint getReferencePoint()
+    public int getWidth()
     {
-        return this.ref;
+        return 0;
     }
-
-    @Override
-    public void setReferencePoint(ReferencePoint reference)
+    
+    public int getLenght()
     {
-        this.ref = reference;
+        return 0;
     }
 }

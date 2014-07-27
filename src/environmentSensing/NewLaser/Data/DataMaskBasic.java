@@ -22,13 +22,13 @@ public class DataMaskBasic implements IDataProvider <Integer>
     }
 
     @Override
-    public Integer getDistance(int index) throws Exception
+    public Integer getDistance(int index)
     {
         return this.interpretAsInt(this.getPointer(Segment.DISTANCE_DATA) + index);
     }
     
     @Override
-    public Integer[] getDistance(int startIdx, int endIdx) throws Exception
+    public Integer[] getDistance(int startIdx, int endIdx)
     {
         Integer[] temp = new Integer[endIdx - startIdx];
         for(int countFor = 0; countFor < temp.length; countFor++)
@@ -39,7 +39,7 @@ public class DataMaskBasic implements IDataProvider <Integer>
     }
 
     @Override
-    public Integer[] getDistance() throws Exception
+    public Integer[] getDistance()
     {
         Integer[] temp = new Integer[this.getNrDistance()];
         for(int countFor = 0; countFor < temp.length; countFor++)

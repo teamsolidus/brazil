@@ -1,12 +1,8 @@
 package environmentSensing.positioning.positionEvaluation;
 
-import References.AReferencePoint;
-import References.ReferencePoint;
+import environmentSensing.positioning.positionEvaluation.wall.Wall;
 import environmentSensing.NewLaser.Solidus.LaserFactory;
-import environmentSensing.NewLaser.MeasuredResult;
-import environmentSensing.NewLaser.ReflectionPoint;
-import environmentSensing.positioning.positionEvaluation.dummyScenarios.Scenario1;
-import environmentSensing.positioning.positionEvaluation.dummyScenarios.Scenario2;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -35,13 +31,13 @@ public class WallDetector extends Observable
         List<Wall> wallBuffer = new ArrayList<>();
         Wall tempWall = null;
         
-        MeasuredResult measuredResult = LaserFactory.getInstance().getEnvironmentSensor().getEnvironmentReflections();
+        IEnvironmentReflections measuredResult = LaserFactory.getInstance().getEnvironmentSensor().getEnvironmentReflections();
         
         int x = 0;
         
-        while(x < (measuredResult.getReflectionPoints().size()-1))
+        while(x < (measuredResult.getEnvironmentReflections().length-1))
         {
-            ReflectionPoint tempPoint = measuredResult.getReflectionPoints().get(x);
+            Point tempPoint = measuredResult.getEnvironmentReflections()[x];
             System.out.println("New tempPoint: " + tempPoint);
             
             boolean matchesPointWithWallFromBuffer = false;
@@ -84,7 +80,7 @@ public class WallDetector extends Observable
                 }
                 else
                 {
-                    tempWall = new Wall(measuredResult.getReference(), tempPoint, measuredResult.getReflectionPoints().get(x+1));
+                    tempWall = new Wall(tempPoint, measuredResult.getEnvironmentReflections()[x+1]);
                     System.out.println("New tempWall created: " + tempWall);
                     x = x + 2;
                 }
@@ -103,7 +99,7 @@ public class WallDetector extends Observable
         for(Wall wall : wallBuffer)
         {
             newResult.addValidWall(wall);
-            System.out.println("Validate wall: " + wall.validateWall(measuredResult.getReflectionPoints()));
+            System.out.println("Validate wall: " + wall.validateWall(measuredResult.getEnvironmentReflections()));
         }
         
         // Check Intersections (each valid wall with each other)
@@ -113,7 +109,7 @@ public class WallDetector extends Observable
             {
                 try
                 {
-                    ReferencePoint tempCorner = newResult.getValidDetectedWalls().get(n).checkIntersectionWithOtherWall(newResult.getValidDetectedWalls().get(m));
+                    Point tempCorner = newResult.getValidDetectedWalls().get(n).checkIntersectionWithOtherWall(newResult.getValidDetectedWalls().get(m));
                     newResult.addDetectedCorner(tempCorner);
                     System.out.println("Corner Detected: " + tempCorner);
                 }

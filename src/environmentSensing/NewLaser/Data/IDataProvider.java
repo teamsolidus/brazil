@@ -8,11 +8,11 @@ public interface IDataProvider <T>
 {
     public int getNrDistance();
     
-    public T getDistance(int idx) throws Exception;
+    public T getDistance(int idx);
     
-    public T[] getDistance(int startIdx, int endIdx) throws Exception;
+    public T[] getDistance(int startIdx, int endIdx);
     
-    public T[] getDistance() throws Exception;
+    public T[] getDistance();
     
     public int getStartAngle();
     

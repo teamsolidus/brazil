@@ -1,7 +1,9 @@
 
 package environmentSensing.positioning.positionEvaluation;
 
+import environmentSensing.positioning.positionEvaluation.wall.Wall;
 import References.ReferencePoint;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
 public class DetectionResult
 {
     private List<Wall> validDetectedWalls;
-    private List<ReferencePoint> detectedCorners;
+    private List<Point> detectedCorners;
     private ResultType resultType;
     
     public enum ResultType
@@ -34,7 +36,7 @@ public class DetectionResult
         this.resultType = ResultType.ONLY_WALL;
     }
     
-    public DetectionResult(List<Wall> validDetectedWalls, List<ReferencePoint> detectedCorners)
+    public DetectionResult(List<Wall> validDetectedWalls, List<Point> detectedCorners)
     {
         this.validDetectedWalls = validDetectedWalls;
         this.detectedCorners = detectedCorners;
@@ -57,7 +59,7 @@ public class DetectionResult
         }
     }
     
-    public void addDetectedCorner(ReferencePoint corner)
+    public void addDetectedCorner(Point corner)
     {
         if(this.detectedCorners == null)
         {
@@ -75,7 +77,7 @@ public class DetectionResult
         return this.validDetectedWalls;
     }
     
-    public List<ReferencePoint> getDetectedCorners()
+    public List<Point> getDetectedCorners()
     {
         return this.detectedCorners;
     }

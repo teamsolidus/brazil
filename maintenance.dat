@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.7.0_21" class="java.beans.XMLDecoder">
+ <object class="Sequence.JobController" id="JobController0">
+  <void class="Sequence.JobController" method="getField">
+   <string>jobCounter</string>
+   <void method="set">
+    <object idref="JobController0"/>
+    <int>3</int>
+   </void>
+  </void>
+ </object>
+</java>

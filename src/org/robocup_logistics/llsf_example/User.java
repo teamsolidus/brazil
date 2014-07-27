@@ -1,8 +1,10 @@
 package org.robocup_logistics.llsf_example;
 
 import java.io.IOException;
+import java.nio.channels.UnresolvedAddressException;
 
 import org.robocup_logistics.llsf_comm.ProtobufBroadcastPeer;
+import org.robocup_logistics.llsf_comm.ProtobufClient;
 import org.robocup_logistics.llsf_comm.ProtobufMessage;
 import org.robocup_logistics.llsf_msgs.BeaconSignalProtos.BeaconSignal;
 import org.robocup_logistics.llsf_msgs.GameStateProtos.GameState;
@@ -20,7 +22,7 @@ public class User {
 	
 	private final static String TEAM_NAME = "Solidus";
 	private final static String ENCRYPTION_KEY = "randomkey";
-	private static Team TEAM_COLOR;
+	private static Team TEAM_COLOR = Team.CYAN;
 	
 	private static ProtobufBroadcastPeer peerPublic;
 	private static ProtobufBroadcastPeer peerPrivate;
@@ -52,43 +54,43 @@ public class User {
 		peerPublic.register_handler(handler);
 		
 		//Send and receive message via stream
-//		ProtobufClient client = new ProtobufClient("localhost", 4444);
-//		try {
-//			client.connect();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (UnresolvedAddressException e) {
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		client.<RobotInfo>add_message(RobotInfo.class);
-//		
-//		Handler handler = new Handler();
-//		client.register_handler(handler);
-//		
-//		NanoSecondsTimestampProvider nstp = new NanoSecondsTimestampProvider();
-//
-//		long ms = System.currentTimeMillis();
-//		long ns = nstp.currentNanoSecondsTimestamp();
-//
-//		int sec = (int) (ms / 1000);
-//		long nsec = ns - (ms * 1000000L);
-//			
-//		Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
-//		BeaconSignal bs = BeaconSignal.newBuilder().setTime(t).setSeq(1).setNumber(1).setPeerName("R-1").setTeamName(TEAM_NAME).build();
-//			
-//		ProtobufMessage msg = new ProtobufMessage(2000,1,bs);		
-//		client.enqueue(msg);
+		ProtobufClient client = new ProtobufClient("172.26.100.100", 4444);
+		try {
+			client.connect();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnresolvedAddressException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
-//		
-//		try {
-//			Thread.sleep(3000);
-//		} catch (InterruptedException e) {
-//		}
-//
-//		client.disconnect(true);
+		client.<RobotInfo>add_message(RobotInfo.class);
+		
+		//Handler handler = new Handler();
+		client.register_handler(handler);
+		
+		NanoSecondsTimestampProvider nstp = new NanoSecondsTimestampProvider();
+
+		long ms = System.currentTimeMillis();
+		long ns = nstp.currentNanoSecondsTimestamp();
+
+		int sec = (int) (ms / 1000);
+		long nsec = ns - (ms * 1000000L);
+			
+		Time t = Time.newBuilder().setSec(sec).setNsec(nsec).build();
+		BeaconSignal bs = BeaconSignal.newBuilder().setTime(t).setSeq(1).setNumber(1).setPeerName("R-1").setTeamName(TEAM_NAME).build();
+			
+		ProtobufMessage msg = new ProtobufMessage(2000,1,bs);		
+		client.enqueue(msg);
+		
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
+
+		client.disconnect(true);
 		
 	}
 	
@@ -112,10 +114,10 @@ public class User {
 		//See config.yaml for further information on the ports.
 		switch (TEAM_COLOR) {
 		case CYAN:
-			peerPrivate = new ProtobufBroadcastPeer("x.x.x.255", 4446, 4441, true, 2, ENCRYPTION_KEY);
+			peerPrivate = new ProtobufBroadcastPeer("172.26.255.255", 4441, 4441, true, 2, ENCRYPTION_KEY);
 			break;
 		case MAGENTA:
-			peerPrivate = new ProtobufBroadcastPeer("x.x.x.255", 4447, 4442, true, 2, ENCRYPTION_KEY);
+			peerPrivate = new ProtobufBroadcastPeer("172.26.255.255", 4442, 4442, true, 2, ENCRYPTION_KEY);
 			break;
 		}
 	
@@ -134,9 +136,10 @@ public class User {
 			peerPrivate.register_handler(handler);
 	
 			MachineReportProtos.MachineReportEntry mi = MachineReportProtos.MachineReportEntry.newBuilder().setName("M1").setType("T1").build();
-			MachineReport mr = MachineReport.newBuilder().addMachines(mi).setTeamColor(Team.CYAN).build();
+			MachineReport mr = MachineReport.newBuilder().addMachines(mi).setTeamColor(TEAM_COLOR).build();
 			ProtobufMessage machineReport = new ProtobufMessage(2000, 61, mr);
 			peerPrivate.enqueue(machineReport);
+                        peerPublic.enqueue(machineReport);
 			
 			new Thread(new Runnable() {
 				

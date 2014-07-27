@@ -32,20 +32,20 @@ public class DummyProvider implements IDataProvider<Integer>
     }
 
     @Override
-    public Integer getDistance(int idx) throws Exception
+    public Integer getDistance(int idx)
     {
         return 0;
     }
 
     @Override
-    public Integer[] getDistance(int startIdx, int endIdx) throws Exception
+    public Integer[] getDistance(int startIdx, int endIdx)
     {
         Integer[] temp = new Integer[0];
         return temp;
     }
 
     @Override
-    public Integer[] getDistance() throws Exception
+    public Integer[] getDistance()
     {
         Integer[] temp = new Integer[0];
         return temp;

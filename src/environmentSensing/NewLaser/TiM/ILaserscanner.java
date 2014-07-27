@@ -18,7 +18,7 @@ public interface ILaserscanner
     
     public void stopContinuousMeas() throws Exception;
     
-    public IDataProvider<Integer> getData() throws Exception;
+    public IDataProvider<Integer> getData();
     
     public void addObserver(Observer obs);
 }

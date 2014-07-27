@@ -1,4 +1,4 @@
-package environmentSensing.positioning.positionEvaluation;
+package environmentSensing.positioning.positionEvaluation.wall;
 
 import References.AReferencePoint;
 import References.AbsoluteReferencePoint;
@@ -12,36 +12,29 @@ import java.util.logging.Logger;
  */
 public class StraightLine
 {
-
-    private AReferencePoint reference;
     private double angle;
     private Point basePoint;
 
     public StraightLine()
     {
-        this.reference = AbsoluteReferencePoint.getInstance();
         this.angle = 0;
         this.basePoint = new Point(0, 0);
     }
 
-    public StraightLine(AReferencePoint reference, Point basePoint, Point definitionPoint)
+    public StraightLine(Point basePoint, Point definitionPoint)
     {
-        this.reference = reference;
-        this.defineLineWithTwoPoints(reference, basePoint, definitionPoint);
+        this.defineLineWithTwoPoints(basePoint, definitionPoint);
     }
 
     //Definitions
-    public void defineLineWithPointAndAngle(AReferencePoint reference, Point basePoint, long angle)
+    public void defineLineWithPointAndAngle(Point basePoint, long angle)
     {
-        this.reference = reference;
         this.basePoint = basePoint;
         this.angle = angle;
     }
 
-    public final void defineLineWithTwoPoints(AReferencePoint reference, Point basePoint, Point definitionPoint)
+    public final void defineLineWithTwoPoints(Point basePoint, Point definitionPoint)
     {
-        this.reference = reference;
-
         // Check 90 Degrees Tan-Exception
         if (basePoint.getX() == definitionPoint.getX())
         {
@@ -166,7 +159,6 @@ public class StraightLine
     {
         straightLine.setAngle(this.angle);
         straightLine.setBasePoint(this.basePoint);
-        straightLine.setReference(this.reference);
 
         return straightLine;
     }
@@ -214,16 +206,6 @@ public class StraightLine
     }
 
     // Getter & Setter
-    public AReferencePoint getReference()
-    {
-        return reference;
-    }
-
-    public void setReference(AReferencePoint reference)
-    {
-        this.reference = reference;
-    }
-
     public double getAngle()
     {
         return angle;
@@ -255,8 +237,8 @@ public class StraightLine
         // Test-Case 1
         StraightLine sl1 = new StraightLine();
         StraightLine sl2 = new StraightLine();
-        sl1.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(0, 2), new Point(2, 0));
-        sl2.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(0, 0), new Point(2, 2));
+        sl1.defineLineWithTwoPoints(new Point(0, 2), new Point(2, 0));
+        sl2.defineLineWithTwoPoints(new Point(0, 0), new Point(2, 2));
 
         System.out.println("Angle: " + sl1.angle);
         System.out.println("Angle: " + sl2.angle);
@@ -273,8 +255,8 @@ public class StraightLine
         // Test-Case 2
         StraightLine sl3 = new StraightLine();
         StraightLine sl4 = new StraightLine();
-        sl3.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(1, 0), new Point(3, 4));
-        sl4.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(0, 0), new Point(4, 4));
+        sl3.defineLineWithTwoPoints(new Point(1, 0), new Point(3, 4));
+        sl4.defineLineWithTwoPoints(new Point(0, 0), new Point(4, 4));
 
         System.out.println("Angle: " + sl3.angle);
         System.out.println("Angle: " + sl4.angle);
@@ -291,8 +273,8 @@ public class StraightLine
         // Test-Case 2
         StraightLine sl5 = new StraightLine();
         StraightLine sl6 = new StraightLine();
-        sl5.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(2, 0), new Point(0, 2));
-        sl6.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(1, 0), new Point(1, 2));
+        sl5.defineLineWithTwoPoints(new Point(2, 0), new Point(0, 2));
+        sl6.defineLineWithTwoPoints(new Point(1, 0), new Point(1, 2));
 
         System.out.println("Angle: " + sl5.angle);
         System.out.println("Angle: " + sl6.angle);
@@ -308,14 +290,14 @@ public class StraightLine
 
         //Shift Line Test rising
         StraightLine sl7 = new StraightLine();
-        sl7.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(2, 2), new Point(5, 5));
+        sl7.defineLineWithTwoPoints(new Point(2, 2), new Point(5, 5));
         System.out.println(sl7);
         sl7.shiftLineParallel90Degree(-3);
         System.out.println(sl7);
         
         //Shift Line test sinking
         StraightLine sl8 = new StraightLine();
-        sl8.defineLineWithTwoPoints(AbsoluteReferencePoint.getInstance(), new Point(2, 4), new Point(5, 3));
+        sl8.defineLineWithTwoPoints(new Point(2, 4), new Point(5, 3));
         System.out.println(sl8);
         sl8.shiftLineParallel90Degree(-10);
         System.out.println(sl8);

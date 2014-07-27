@@ -41,7 +41,7 @@ public class DataMaskAverage implements IDataProvider<Integer>
     }
 
     @Override
-    public Integer getDistance(int idx) throws Exception
+    public Integer getDistance(int idx)
     {
         Integer tempFilteredData = new Integer(0);
 
@@ -62,7 +62,7 @@ public class DataMaskAverage implements IDataProvider<Integer>
     }
 
     @Override
-    public Integer[] getDistance(int startIdx, int endIdx) throws Exception
+    public Integer[] getDistance(int startIdx, int endIdx)
     {
         Integer[] temp = new Integer[endIdx - startIdx];
         for (int countFor = 0; countFor < temp.length; countFor++)
@@ -73,7 +73,7 @@ public class DataMaskAverage implements IDataProvider<Integer>
     }
 
     @Override
-    public Integer[] getDistance() throws Exception
+    public Integer[] getDistance()
     {
         Integer[] temp = new Integer[this.getNrDistance()];
         for (int countFor = 0; countFor < temp.length; countFor++)

@@ -6,6 +6,7 @@ import environmentSensing.Environment;
 import environmentSensing.positioning.DTOPosition;
 import environmentSensing.positioning.ILaserPositionEvaluator;
 import environmentSensing.positioning.NoReferenceException;
+import java.awt.Point;
 import java.util.List;
 import java.util.Observer;
 
@@ -78,7 +79,7 @@ public class PositionEvaluator implements ILaserPositionEvaluator
         DetectionResult result = this.wallDetector.detectWalls();
 
         // Corner detected?
-        List<ReferencePoint> corners = result.getDetectedCorners();
+        List<Point> corners = result.getDetectedCorners();
 
         switch (corners.size())
         {
@@ -99,6 +100,10 @@ public class PositionEvaluator implements ILaserPositionEvaluator
                         case WEST:
                             break;
                     }
+                }
+                else
+                {
+                    System.out.println("No Result");
                 }
                 break;
             case 1:
@@ -152,7 +157,7 @@ public class PositionEvaluator implements ILaserPositionEvaluator
                         }
                         break;
                 }
-                        AReferencePoint tempReferenceForCalculation = new ReferencePoint((corners.get(0).getX() * -1), (corners.get(0).getY() * -1), corners.get(0).getAngle(), detectedCorner);
+                        AReferencePoint tempReferenceForCalculation = null;
                         
                         DTOPosition tempPosition = new DTOPosition(DTOPosition.ReferenceCase.ALL_REFERENCES,
                                 tempReferenceForCalculation.getAbsolutX(),

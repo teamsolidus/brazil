@@ -5,7 +5,7 @@ import References.AReferencePoint;
 import java.awt.Point;
 
 /**
- * Describes, how the GUI-Elements is positioned to the absolute null point and the diameter og the GUI.
+ * Describes, how the GUI-Elements is positioned to the absolute null point and the diameter on the GUI.
  * @author simon.buehlmann
  */
 public class GUIReference
@@ -14,6 +14,14 @@ public class GUIReference
     private final int GUI_SCALE;
     private final int GUI_WIDTH, GUI_HEIGHT;
     
+    /**
+     * 
+     * @param x Not scaled Distance from ReferencePoint to GUI Reference
+     * @param y Not scalled Distance from ReferencePoint to GUI Reference
+     * @param scale 
+     * @param width Not scaled width from gui
+     * @param height Not scaled height from gui
+     */
     public GUIReference(int x, int y, int scale, int width, int height)
     {
         this.X_POS = x;
@@ -25,12 +33,22 @@ public class GUIReference
     
     public int calculateGuiXPosition(AReferencePoint otherReference)
     {
-        return ((this.X_POS*-1) + otherReference.getAbsolutX())/this.GUI_SCALE;
+        return this.calculateGuiXPosition(otherReference.getAbsolutX());
+    }
+    
+    public int calculateGuiXPosition(int absoluteX)
+    {
+        return ((this.X_POS*-1) + absoluteX)/this.GUI_SCALE;
     }
     
     public int calculateGuiYPosition(AReferencePoint otherReference)
     {
-        return (this.Y_POS - otherReference.getAbsolutY())/this.GUI_SCALE;
+        return this.calculateGuiYPosition(otherReference.getAbsolutY());
+    }
+    
+    public int calculateGuiYPosition(int absoluteY)
+    {
+        return (this.Y_POS - absoluteY)/this.GUI_SCALE;
     }
     
     public Point calculateGuiPoint(AReferencePoint otherReference)
@@ -48,7 +66,12 @@ public class GUIReference
         
         return new Point(tempX, tempY);
     }
-     
+    
+    public int calculateGuiDistance(int value)
+    {
+        return value/this.GUI_SCALE;
+    }
+    
     // Getter & Setter
     public int getGuiScale()
     {
@@ -63,5 +86,14 @@ public class GUIReference
     public int getGuiLength()
     {
         return this.GUI_WIDTH;
+    }
+    
+    /**
+     * Refer to the zero point, not to the gui reference. Unscaled!
+     * @return 
+     */
+    public int getXRight()
+    {
+        return 0;
     }
 }

@@ -81,7 +81,7 @@ public class TiM55x implements Observer, ILaserscanner
     }
     
     @Override
-    public IDataProvider<Integer> getData() throws Exception
+    public IDataProvider<Integer> getData()
     {
         return new DataMaskBasic(container.getMeasurementData());
     }

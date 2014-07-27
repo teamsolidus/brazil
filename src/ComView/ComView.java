@@ -8,22 +8,33 @@
  */
 package ComView;
 
-import MainPack.Main;
+import Tools.SolidusLoggerFactory;
+import environmentSensing.EnvironmentSensingFactory;
+import environmentSensing.collisionDetection.CollisionDetector;
 import java.net.DatagramSocket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
+import org.apache.log4j.Logger;
 
-public class ComView extends Thread
+public class ComView extends Thread implements Observer
 {
 
+    private static Logger MAIN_LOGGER;
+    private static Logger SPEEDPERCENT_LOGGER;
+    
+    private int speedpercentBuffer;
+    
     private static ComView instance;
-
+    
     int counter = 0;
+
+    private boolean breakingAllowed;
+    private boolean firstTimeZeroPercent, avoidAllowed;
 
     // UDP - Socket    
     UDPServer com;
     DatagramSocket serverSocket;
+    
 
     // Speicher für lesende Nachricht
     // int[] msg;
@@ -35,7 +46,7 @@ public class ComView extends Thread
     private int station;                // Stationsanfahren
     private int go;                     // Empfangsbestätigung 
     private int phase;                  // Spielphase
-    public int breakingFactor =100;
+    private int breakingFactor = 100;
 
     // Empfangen
     int ready;                          // Step ausgeführt
@@ -48,7 +59,7 @@ public class ComView extends Thread
 
     // Schleifenbedingung
     public boolean run = true;
-
+    
     public static ComView getInstance()
     {
         if (instance == null)
@@ -57,13 +68,15 @@ public class ComView extends Thread
         }
         return instance;
     }
-
+    
     public ComView()
     {
-        // this.laser = laser;
-        // Reverentieren
+        MAIN_LOGGER = SolidusLoggerFactory.getMain();
+        SPEEDPERCENT_LOGGER = SolidusLoggerFactory.getSpeedPercent();
+        
+        this.speedpercentBuffer = 100;
+        
         com = new UDPServer();
-     
 
         // msg = new int[10];
         x = 0;
@@ -73,7 +86,7 @@ public class ComView extends Thread
         station = 0;
         go = 0;
         phase = 0;
-
+        
         ready = 0;
         red = 0;
         orange = 0;
@@ -81,8 +94,12 @@ public class ComView extends Thread
         ende = 0;
         xAktuell = 0;
         yAktuell = 0;
-    }
 
+        // Listen as observer to collision detection
+        EnvironmentSensingFactory.getInstance().getCollisionDetector().addObserver(this);
+        
+    }
+    
     @Override
     public void run()
     {
@@ -91,13 +108,14 @@ public class ComView extends Thread
             try
             {
                 serverSocket = new DatagramSocket(5000);
+                
                 int[] sendKoor =
                 {
-                    x, y, phi, station, 0, go,breakingFactor , 0
+                    x, y, phi, station, 0, go, breakingFactor, 0
                 };
-
+                
                 com.sendViewMessage(sendKoor, "127.0.0.1", 5001);
-
+                
                 int[] msg = com.getViewMessagr(serverSocket);
                 ready = msg[0];
                 red = msg[1];
@@ -107,22 +125,23 @@ public class ComView extends Thread
                 xAktuell = msg[5];
                 yAktuell = msg[6];
                 serverSocket.close();
-
-            } catch (Exception ex)
+                
+            }
+            catch (Exception ex)
             {
-                Main.log.error(ex);
+                MAIN_LOGGER.fatal("Error in comview Thread! Message: " + ex.getMessage());
             }
             try
             {
                 Thread.sleep(100);
-            } catch (InterruptedException ex)
-            {
-                Logger.getLogger(ComView.class.getName()).log(Level.SEVERE, null, ex);
             }
-           
+            catch (InterruptedException ex)
+            {
+                MAIN_LOGGER.fatal("Error in comview Thread (sleep)! Message: " + ex.getMessage());
+            }
         }
     }
-
+    
     public void setGo(int go)
     {
         this.go = go;
@@ -142,17 +161,14 @@ public class ComView extends Thread
         };
         return lamp;
     }
-
+    
     public int getReady()
     {
-        // System.out.println(">>>>>>>>>>>>>>> GET NOW READY <<<<<<<<<<<<<<");
         return ready;
     }
-
+    
     public int getEnde()
     {
-
-        //  System.out.println("Ende wurde empfagnen: " + ende);
         return ende;
     }
 
@@ -163,48 +179,99 @@ public class ComView extends Thread
      */
     public void setStation(int go)
     {
-
         station = go;
         System.out.println(station);
-
     }
-
+    
     public void setKoords(int x, int y, int phi)
     {
-
         this.x = x;
-
         this.y = y;
-
         this.phi = phi;
-
     }
-
+    
     public int getPhase()
     {
         return phase;
     }
-
+    
     public void setPhase(int phase)
     {
         this.phase = phase;
     }
-
+    
     public int getxAktuell()
     {
         return xAktuell;
     }
-
+    
     public int getyAktuell()
     {
         return yAktuell;
     }
-
-    public static void main(String[] args) throws IOException
+    
+    public void setSpeedPercent(int speedPercent)
     {
-        // TiM55x_Solidus laser = new TiM55x_Solidus();
-        ComView com = new ComView();
-        com.start();
+        if (this.isBreakingAllowed())
+        {
+            this.breakingFactor = speedPercent;
+        }
+    }
+    
+    public int getBreakingFactor()
+    {
+        return breakingFactor;
+    }
+    
+    public void setBreakingFactor(int breakingFactor)
+    {
+        this.breakingFactor = breakingFactor;
+    }
+    
+    public boolean isBreakingAllowed()
+    {
+        return breakingAllowed;
+    }
+    
+    public void setBreakingAllowed(boolean breakingAllowed)
+    {
+        this.breakingAllowed = breakingAllowed;
+        
+        if (!breakingAllowed)
+        {
+            // Breaking not allowed, re-init on 100%
+            this.breakingFactor = 100;
+            SPEEDPERCENT_LOGGER.debug("DISABLE collision detection");
+        }
+        else
+        {
+            this.breakingFactor = speedpercentBuffer;
+            SPEEDPERCENT_LOGGER.debug("ENABLE collision detection");
+        }
     }
 
+    public boolean isAvoidAllowed()
+    {
+        return avoidAllowed;
+    }
+
+    public void setAvoidAllowed(boolean avoidAllowed)
+    {
+        this.avoidAllowed = avoidAllowed;
+    }
+
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        if (((Object) o).getClass() == CollisionDetector.class)
+        {
+            // Changed speed percent
+            SPEEDPERCENT_LOGGER.debug("Observer in comview called. Speed: " + (int) arg + "%");
+            this.speedpercentBuffer = (int) arg;
+            this.setSpeedPercent(this.speedpercentBuffer);
+        } else
+        {
+            MAIN_LOGGER.error("Unknown observable inform comview!");
+        }
+    }
 }

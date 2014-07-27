@@ -1,4 +1,3 @@
-
 package environmentSensing.NewLaser.Data;
 
 import References.ReferencePoint;
@@ -10,15 +9,16 @@ import java.awt.Point;
  */
 public class DataMaskCoordinates implements IDataProvider<Point>
 {
+
     private IDataProvider<Integer> data;
     private ReferencePoint ref;
-    
+
     public DataMaskCoordinates(IDataProvider<Integer> data, ReferencePoint ref)
     {
         this.data = data;
         this.ref = ref;
     }
-    
+
     @Override
     public int getNrDistance()
     {
@@ -26,29 +26,37 @@ public class DataMaskCoordinates implements IDataProvider<Point>
     }
 
     @Override
-    public Point getDistance(int idx) throws Exception
+    public Point getDistance(int idx)
     {
         Point tempReturn = new Point(calculateX(idx), calculateY(idx));
         return tempReturn;
     }
 
     @Override
-    public Point[] getDistance(int startIdx, int endIdx) throws Exception
+    public Point[] getDistance(int startIdx, int endIdx)
     {
-        Point[] tempPoint = new Point[endIdx - startIdx];
-        
-        for(int countFor = 0; countFor < tempPoint.length; countFor++)
+        try // Bug Workaround Solidus Brazil
         {
-            tempPoint[countFor] = this.getDistance(startIdx + countFor);
+            Point[] tempPoint = new Point[endIdx - startIdx];
+
+            for (int countFor = 0; countFor < tempPoint.length; countFor++)
+            {
+                tempPoint[countFor] = this.getDistance(startIdx + countFor);
+            }
+
+            return tempPoint;
         }
-        
-        return tempPoint;
+        catch (Exception ex)
+        {
+            System.out.println("LASER ERROR: Unexpected Data recived");
+            return new Point[0];
+        }
     }
 
     @Override
-    public Point[] getDistance() throws Exception
+    public Point[] getDistance()
     {
-        return this.getDistance(0, data.getNrDistance()-1);
+        return this.getDistance(0, data.getNrDistance() - 1);
     }
 
     @Override
@@ -62,42 +70,45 @@ public class DataMaskCoordinates implements IDataProvider<Point>
     {
         return data.getSteps();
     }
-    
+
     /**
      * Calc the X Coordinate from the handed parameters
+     *
      * @param data
      * @param angleDeg
      * @param refX
-     * @return 
+     * @return
      */
-    private int calculateX(int index) throws Exception
+    private int calculateX(int index)
     {
         int tempAngle = this.alphaCalculator(index);
         double tempReturn = (Math.cos(Math.toRadians(tempAngle)) * data.getDistance(index)) + this.ref.getX();
-        return (int)tempReturn;
+        return (int) tempReturn;
     }
-    
+
     /**
      * Calc the Y Cordinate from the handed parameters
+     *
      * @param data
      * @param angleDeg
      * @param refY
-     * @return 
+     * @return
      */
-    private int calculateY(int index) throws Exception
+    private int calculateY(int index)
     {
         int tempAngle = this.alphaCalculator(index);
         double tempReturn = (Math.sin(Math.toRadians(tempAngle)) * data.getDistance(index)) + this.ref.getY();
-        return (int)tempReturn;
+        return (int) tempReturn;
     }
-    
+
     /**
      * Calc the alpha angle from the handed parameters
+     *
      * @param index
      * @param startAngle
      * @param angleSteps
      * @param referenceAngle
-     * @return 
+     * @return
      */
     private int alphaCalculator(int index)
     {
@@ -105,5 +116,4 @@ public class DataMaskCoordinates implements IDataProvider<Point>
         return temp;
     }
 
-    
 }

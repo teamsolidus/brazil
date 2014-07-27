@@ -13,7 +13,5 @@ public interface ILaserOperatorSolidus
     
     public void stopContinuousMeasurement() throws Exception;
     
-    public MeasDataSolidus getMeasurementData() throws Exception;
-    
     public void addObserver(Observer Obs);
 }

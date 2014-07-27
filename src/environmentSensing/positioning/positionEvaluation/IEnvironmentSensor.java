@@ -1,7 +1,6 @@
 
 package environmentSensing.positioning.positionEvaluation;
 
-import environmentSensing.NewLaser.MeasuredResult;
 
 /**
  *
@@ -9,5 +8,5 @@ import environmentSensing.NewLaser.MeasuredResult;
  */
 public interface IEnvironmentSensor
 {
-    public MeasuredResult getEnvironmentReflections();
+    public IEnvironmentReflections getEnvironmentReflections();
 }

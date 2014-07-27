@@ -88,7 +88,7 @@ public class JobController implements Serializable
       },
       //Blond
       {
-        1, 1
+        1, 3
       }
     }
   };
@@ -169,15 +169,15 @@ public class JobController implements Serializable
     {
       //Pink
       {
-        "W4" // has startCell 14/0
+        "W3" // has startCell 14/0
       },
       //Brown
       {
-        "W5"  // has startCell 16/0
+        "W4"  // has startCell 16/0
       },
       //Blond
       {
-        "W6" // has startCell 18/0
+        "W5" // has startCell 18/0
       },
     },
     {

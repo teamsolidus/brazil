@@ -13,6 +13,7 @@ import References.AbsoluteReferencePoint;
 import References.ReferencePoint;
 import Sequence.JobController;
 import Sequence.StateMachine;
+import Tools.Stoppuhr;
 import environmentSensing.collisionDetection.CollisionDetector;
 import environmentSensing.positioning.OptimizationPosition;
 import java.awt.AWTException;
@@ -48,8 +49,8 @@ public class Drive extends Thread
     int alrdyDrivenY, alrdyDrivenX;
     int restWayX, restWayY;
     int lastDeltaX, lastDeltaY;
-    int[] startCellsX = new int[30];
-    int[] startCellsY = new int[30];
+    int[] startCellsX = new int[50];
+    int[] startCellsY = new int[50];
     int countX = 0;
     int countY = 0;
 
@@ -58,14 +59,18 @@ public class Drive extends Thread
     int turnPhi;
     String step = "INIT";
     String avoidStep;
-    boolean firstY, drivingX, drivingY, breakingAllowed, toPuck, toDelivery, toWaitCell;
+    public boolean firstY, toPuck, toDelivery, toWaitCell;
+    public boolean beginningPos;
+    int blablaX, blablaY;
 
     FieldCommander fc;
     ComView comView;
     OptimizationPosition pos;
     JobController job;
+    Stoppuhr stp;
+    ActPos ap;
     private static Drive instance = null;
-    StateMachine sM;
+
     CollisionDetector coll;
 
     public static Drive getInstance() throws AWTException
@@ -83,9 +88,10 @@ public class Drive extends Thread
         this.comView = ComView.getInstance();
         this.fc = FieldCommander.getInstance();
         this.job = JobController.getInstance();
-      
+        Stoppuhr stp = new Stoppuhr();
+
         pos = new OptimizationPosition();
-        // this.coll= CollisionDetector.getInstance();
+    
 
     }
 
@@ -93,27 +99,31 @@ public class Drive extends Thread
     {
         while (running)
         {
-
-            if (breakingAllowed)
+            if (!beginningPos)
             {
-                //comView.breakingFactor = coll.evaluateSpeedPercent();
-
-            } else
-            {
-                comView.breakingFactor = 100;
+                try
+                {
+                    ap = new ActPos();
+                } catch (AWTException ex)
+                {
+                    Logger.getLogger(Drive.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                ap.start();
+                beginningPos = true;
             }
-            // fc.setRoboPos(Main.getJerseyNr(),xAbsolut, yAbsolut, 1);
-            if ((avoid || fc.avoidTest) && !avoidStart)
-            {
-                ///////// WENN GEWISSE ZEIT ABGELAUFEN ---> geh in AVOID STEP //////////////////
 
-                // --> evtl stopuhr benutzen ( wenn faktor genug lange 0 ist dann ausweichen)
-                step = "AVOID";
-            }
+           
+                if ((comView.isAvoidAllowed() || fc.avoidTest) && !avoidStart) // sobald das ausweichen erlaubt wird fällt die State Machine in den Avoid step
+                {
+                    
+                   
+                    step = "AVOID";
+                }
+ 
 
             try
             {
-                Thread.sleep(300);
+                Thread.sleep(400);
                 drive();
             } catch (InterruptedException ex)
             {
@@ -153,9 +163,10 @@ public class Drive extends Thread
 
                     if (((startCellX % 2) != 0 && endTargetX == 0)
                         || ((startCellX % 2) != 0 && endTargetY == 0)
-                        || startCellX == 0
-                        || (startCellX % 2 != 0 && deltaY != 0))
-
+                        || (startCellX == 0 && startCellY !=7)
+                        || startCellY % 2 == 0 && startCellY == endTargetY
+                        || (startCellX % 2 != 0 && deltaY != 0)
+                       )
                     {
                         firstY = true;
                     }
@@ -169,13 +180,6 @@ public class Drive extends Thread
                         toDelivery = true;
                     }
 
-                    // loadCell near machine hier angeben
-                    if (endCell == fc.cell[1][7] || endCell == fc.cell[3][7])
-                    {
-
-                        toWaitCell = true;
-                    }
-
                     //   beginning = false;
                     step = "START";
                 }
@@ -186,7 +190,7 @@ public class Drive extends Thread
                 {
                     step = "ROTATE_Y";
 
-                } else if (((startCellY % 2) != 0) || (startCellY < 2) || (startCellX < 2)|| startCellY==8)
+                } else if (((startCellY % 2) != 0) || (startCellY < 2) || (startCellX < 2) || startCellY == 8)
                 {
                     step = "ROTATE_X";
 
@@ -207,13 +211,13 @@ public class Drive extends Thread
                 {
                     step = "X";
                 }
-                if (startCellX >= endTargetX && startPosPhi != 270) // wenn die startposition grösser als die endposition ist muss er ins minus fahren.. folglich nach links drehen
+                if (startCellX > endTargetX && startPosPhi != 270) // wenn die startposition grösser als die endposition ist muss er ins minus fahren.. folglich nach links drehen
                 {
                     rotate("W");
                     step = "WAIT_AVOID";
                     nextStep = "X";
                 }
-                if (startCellX < endTargetX && startPosPhi != 90) // nach rechts drehen wenn endposition grösser ist als startposition
+                if (startCellX <= endTargetX && startPosPhi != 90) // nach rechts drehen wenn endposition grösser ist als startposition
                 {
                     rotate("E");
                     step = "WAIT_AVOID";
@@ -224,7 +228,7 @@ public class Drive extends Thread
 
             //</editor-fold>
             case "X":
-                avoidY = false;
+
                 //<editor-fold defaultstate="collapsed" desc="in X verfahren">
 
                 /* im Prinzip zwei fälle... wenn er bereits auf einer Maschinenachse ist oder wenn er in einem gang ist
@@ -251,12 +255,12 @@ public class Drive extends Thread
                 {
                     startCellX = startCellX + deltaCellsX;
                     step = "DRIVE_X";
-                } else if (startCellY != endTargetY)
+                } else
                 {
                     onMachine = true;
                     // wenn Y nicht auf gleicher Höhe muss ich abbiegen
 
-                    if (deltaCellsX < 0) // Minus bzw Plus rechnen einer Zelle damit man einen Gang erwischt 
+                    if (deltaCellsX <= 0) // Minus bzw Plus rechnen einer Zelle damit man einen Gang erwischt 
                     //ob ich von rechts oder links komme spielt hier eine rolle weil minus oder plus eine Zelle
                     {
 
@@ -305,50 +309,40 @@ public class Drive extends Thread
 
                 }
                 lastDeltaX = deltaX;
-                breakingAllowed = true;
+                countX++;
+                startCellsX[countX] = startCellX;
+                
+                
+                comView.setBreakingAllowed(true);
+                
                 comView.setKoords(deltaX, 0, 0);
-                drivingX = true;
+                avoidX = true;
+              
 
                 deltaX = (endTargetX - startCellX) * FIELDSIZE;
                 deltaCellsX = endTargetX - startCellX;
                 printCellX = startCellX;
-                countX++;
-                startCellsX[countX] = startCellX;
+
                 onMachine = false;
 
                 step = "WAIT";
                 break;
             case "WAIT":
 
-                avoidX = true;
-
                 if (comView.getReady() == 1) // sobald ready vom view kommt soll mit dem senden von Go begonnen werden
                 {
-
+                    avoidX = false;
                     comView.setGo(1);
-                    calcActPos();
-                    drivingX = false;
-                    breakingAllowed = false;
-                    System.out.println(yAbsolut);
-                    System.out.println(xAbsolut);
-                    //    Thread.sleep(110);
+                    //calcActPos();
+                    // drivingX = false;
+                    comView.setBreakingAllowed(false);
 
+                    //    Thread.sleep(110);
                 } else if (comView.getEnde() == 1) // sobald dann die bestätigung kommt, dass die koordinaten geschrieben wurden kann in den nächsten step gewechselt werden
                 {
                     comView.setGo(0);
 
-                    if (startCellX >= endTargetX)
-                    {
-                        oldX = oldX - lastDeltaX;
-
-                    } else
-                    {
-                        oldX = oldX + lastDeltaX;
-                    }
-
-                    // prepared for using positioning method
-                    // range???
-                    // whats to do when not in range? turn and watch other wall?
+                  
                     if (deltaCellsX > 9)
                     {
 
@@ -381,14 +375,14 @@ public class Drive extends Thread
                 {
                     step = "Y";
                 }
-                if (startCellY > endTargetY && startPosPhi != 0)
+                if (startCellY >= endTargetY && startPosPhi != 0)
                 {
                     rotate("N");
                     step = "WAIT_AVOID";
                     nextStep = "Y";
 
                 }
-                if (startCellY <= endTargetY && startPosPhi != 180)
+                if (startCellY < endTargetY && startPosPhi != 180)
                 {
                     rotate("S");
                     step = "WAIT_AVOID";
@@ -400,7 +394,7 @@ public class Drive extends Thread
             //</editor-fold>
 
             case "Y":
-                avoidX = false;
+
                 //<editor-fold defaultstate="collapsed" desc="in Y verfahren">
                 if (((deltaCellsY % 2 != 0) && (startCell.getY() % 2 != 0)) || ((deltaCellsY % 2 == 0) && (startCell.getY() % 2 == 0)))
                 {
@@ -418,12 +412,12 @@ public class Drive extends Thread
             case "ON_MACHINE_Y":
                 onMachine = true;
 
-                if (startCellX == endTargetX ||( startCellX%2!=0 && endTargetY == 8)) // wenn das Ziel Y auf der gleichen Höhe wie das start Y ist
+                if (startCellX == endTargetX ) // wenn das Ziel Y auf der gleichen Höhe wie das start Y ist
                 {
                     startCellY = startCellY + deltaCellsY;
                     step = "DRIVE_Y";
-                    onMachine=false;
-                } else if (startCellY != endTargetY)
+                    onMachine = false;
+                } else
                 {
                     // wenn Y nicht auf gleicher Höhe
 
@@ -431,7 +425,7 @@ public class Drive extends Thread
                     {
                         startCellY = startCellY + deltaCellsY + 1;
                     }
-                    if (deltaCellsY > 0 && !firstY || (endTargetX % 2 != 0 && deltaCellsY < 0)) // else
+                    if (deltaCellsY > 0 && !firstY) // else
                     {
 
                         startCellY = startCellY + deltaCellsY - 1;
@@ -439,19 +433,16 @@ public class Drive extends Thread
 
                     if (firstY)
                     {
-                    
-                        
-                        
-                        if (deltaCellsY < 0)
+
+                        if (deltaCellsY <= 0)
                         {
                             startCellY = startCellY + deltaCellsY - 1;
                         }
                         if (deltaCellsY > 0) // else
                         {
 
-                            startCellY = startCellY + deltaCellsY + 1;
+                            startCellY = startCellY + deltaCellsY - 1;
                         }
-                        
 
                     }
 
@@ -482,14 +473,16 @@ public class Drive extends Thread
 
                 } else if (firstY && onMachine)
                 {
-                    if (deltaCellsY < 0)
+                    if (deltaCellsY > 0)
                     {
                         this.printYroute(deltaCellsY - 1);
+                        deltaY = deltaY - FIELDSIZE;
                     } else
                     {
                         this.printYroute(deltaCellsY + 1);
+                        deltaY = deltaY + FIELDSIZE;
                     }
-                    deltaY = deltaY + FIELDSIZE;
+                    // deltaY = deltaY +FIELDSIZE;
 
                 } else
                 {
@@ -498,9 +491,12 @@ public class Drive extends Thread
 
                 }
 
-                breakingAllowed = true;
+              comView.setBreakingAllowed(true);
+                countY++;
+                startCellsY[countY] = startCellY;
                 comView.setKoords(deltaY, 0, 0);
-                drivingY = true;
+                avoidY = true;
+               
                 lastDeltaY = deltaY;
 
                 deltaY = (endTargetY - startCellY) * FIELDSIZE;
@@ -511,37 +507,34 @@ public class Drive extends Thread
                 onMachine = false;
 
                 firstY = false;
-                countY++;
-                startCellsY[countY] = startCellY;
 
                 step = "WAIT_Y";
                 break;
 
             case "WAIT_Y":
 
-                avoidY = true;
-
                 if (comView.getReady() == 1) // sobald ready vom view kommt soll mit dem senden von Go begonnen werden
                 {
+                    avoidY = false;
                     comView.setGo(1);
-                    calcActPos();
-                    System.out.println(xAbsolut);
-                    System.out.println(yAbsolut);
-                    drivingY = false;
-                    breakingAllowed = false;
+                    //calcActPos();
+                    // System.out.println(xAbsolut);
+                    //System.out.println(yAbsolut);
+                    
+
+                    comView.setBreakingAllowed(false);
 
                 } else if (comView.getEnde() == 1) // sobald dann die bestätigung kommt, dass die koordinaten geschrieben wurden kann in den nächsten step gewechselt werden
                 {
 
-                    if (startCellY >= endTargetY)
-                    {
-                        oldY = oldY - lastDeltaY;
+                    /*  if (startCellY >= endTargetY)
+                     {
+                     oldY = oldY - lastDeltaY;
 
-                    } else
-                    {
-                        oldY = oldY + lastDeltaY;
-                    }
-
+                     } else
+                     {
+                     oldY = oldY + lastDeltaY;
+                     }*/
                     comView.setGo(0);
 
                     step = "START";
@@ -560,7 +553,6 @@ public class Drive extends Thread
                             startCell = endCell;
 
                         } else
-
                         {
                             endPosReached = true;
                         }
@@ -593,7 +585,7 @@ public class Drive extends Thread
             //<editor-fold defaultstate="collapsed" desc="Ausweichen">
 
             case "AVOID":
-                if (comView.breakingFactor == 0)
+                if (comView.getBreakingFactor() == 0)
                 {
 
                     avoidStart = true;
@@ -635,6 +627,8 @@ public class Drive extends Thread
 
                     finalTarget = this.endCell;
                     comView.setStation(888);
+                    
+                 
                     switch (startPosPhi)
                     {
                         case 0:
@@ -666,7 +660,7 @@ public class Drive extends Thread
 
                     Thread.sleep(500);
                     // ist evtl ein timing problem dass er noch nach vorne schnellt
-                    comView.breakingFactor = 100;
+                     comView.setBreakingAllowed(false);
                     comView.setStation(0);
                     nextStep = "GO_BACK";
 
@@ -675,12 +669,12 @@ public class Drive extends Thread
                 break;
 
             case "GO_BACK":
-                breakingAllowed = true;
+               comView.setBreakingAllowed(true);
                 if (avoidX)
                 {
                     if (currentXcell % 2 == 0)
                     {
-
+                        
                         // fahre eine zelle mehr zurück wegen maschine  
                         comView.setKoords(cellRest + FIELDSIZE, 0, 0);
 
@@ -777,11 +771,11 @@ public class Drive extends Thread
             case "WAIT_AVOID":
 
                 waitRoboView();
-                breakingAllowed=false;
+              
                 break;
 
             case "CHANGE_WAY":
-                breakingAllowed=true;
+                comView.setBreakingAllowed(false);
                 comView.setKoords(2 * FIELDSIZE, 0, 0);
 
                 // verschieb dich zum zwei felder z.b von da an danach neuen weg evaluieren und wieder probieren
@@ -793,7 +787,7 @@ public class Drive extends Thread
             case "TO_FINAL":
                 avoidX = false;
                 avoidY = false;
-                avoid = false;
+                comView.setAvoidAllowed(false);
                 fc.avoidTest = false;
                 avoidStart = false;
 
@@ -814,6 +808,7 @@ public class Drive extends Thread
         // globale Variblen machen
         if (comView.getReady() == 1)
         {
+            comView.setBreakingAllowed(false);
             comView.setGo(1);
         } else if (comView.getEnde() == 1)
         {
@@ -949,38 +944,86 @@ public class Drive extends Thread
                 break;
         }
     }
-
-    public void calcActPos()
+    
+    public Cell calcPos(int alrdyDriven)
     {
-        if (drivingX)
+        restWayX = lastDeltaX - alrdyDriven;
+        restWayY = lastDeltaY - alrdyDriven;
+
+        // new calc method    
+        if (avoidX)
         {
 
-            if (startCellsX[countX - 1] >= endTargetX)
+            restWayX = lastDeltaX - alrdyDriven;
+            if (startCellsX[countX - 1] > endTargetX)
             {
-                xAbsolut = oldX + comView.getxAktuell();
-
+                //   restWayX = -1*(restWayX);
+                if (restWayX < 100)
+                {
+                    currentXcell = startCellsX[countX];
+                } else
+                {
+                    currentXcell = -1 * ((alrdyDriven / FIELDSIZE) - startCellsX[countX - 1]);
+                    blablaX = -1 * ((alrdyDriven / FIELDSIZE) - startCellsX[countX - 1]) - alrdyDriven;
+                }
             } else
             {
-                xAbsolut = oldX - comView.getxAktuell();
-            }
-            System.out.println("X " + xAbsolut);
-            System.out.println("Y: " + oldY);
-        }
+                if (restWayX < 100)
+                {
+                    currentXcell = startCellsX[countX];
 
-        if (drivingY)
+                } else
+                {
+                    currentXcell = (alrdyDriven / FIELDSIZE) + startCellsX[countX - 1]; // schneidet int die zahl ab? denke schon... also hast du dann die fertig gefahrene distanz
+                    blablaX = (alrdyDriven / FIELDSIZE) + startCellsX[countX - 1] + alrdyDriven;
+
+                }
+            }
+
+            currentYcell = startCellY;
+            //  System.out.println("Absolut Pos X: " + fc.cell[currentXcell][currentYcell].getRealX() + "Absolute Pos Y: " + fc.cell[currentXcell][currentYcell].getRealY());
+            System.out.println("X: " + fc.cell[currentXcell][currentYcell].getRealX());
+            fc.getRoboPos(job.getRoboNameIdx()).setPosX(fc.cell[currentXcell][currentYcell].getRealX());
+
+            // achtung schneidet kommastelle ab deshalb bin ich bereits auf "abgerundeter" zelle 
+        }
+        if (avoidY)
         {
-            if (startCellsY[countY - 1] >= endTargetY)
-            {
-                yAbsolut = oldY - comView.getxAktuell();
 
+            restWayY = lastDeltaY - alrdyDriven;
+
+            if (startCellsY[countY - 1] > endTargetY)
+            {
+                // restWayY = -1*(restWayY);
+                if (restWayY < 100)
+                {
+                    currentYcell = startCellsY[countY];
+                } else
+                {
+                    currentYcell = -1 * ((alrdyDriven / FIELDSIZE) - startCellsY[countY - 1]);
+                    blablaY = -1 * ((alrdyDriven / FIELDSIZE) - startCellsY[countY - 1]) - alrdyDriven;
+                }
             } else
             {
-                yAbsolut = oldY + comView.getxAktuell();
+                if (restWayY < 100)
+                {
+                    currentYcell = startCellsY[countY];
+                } else
+                {
+                    currentYcell = (alrdyDriven / FIELDSIZE) + startCellsY[countY - 1]; // ACHTUNG Als startzelle wird bereits die endzelle angegeben da diese vorher bereits berechnet wurde
+                    blablaY = (alrdyDriven / FIELDSIZE) + startCellsY[countY - 1] + alrdyDriven;
+                }
             }
+            currentXcell = startCellX;
+            //  System.out.println("Absolut Pos X: " + fc.cell[currentXcell][currentYcell].getRealX() + "Absolute Pos Y: " + fc.cell[currentXcell][currentYcell].getRealY());
+            System.out.println("Y: " + fc.cell[currentXcell][currentYcell].getRealY());
 
-            System.out.println("X " + oldX);
-            System.out.println("Y: " + yAbsolut);
+            fc.getRoboPos(job.getRoboNameIdx()).setPosY(fc.cell[currentXcell][currentYcell].getRealY());
         }
+
+        fc.getRoboPos(job.getRoboNameIdx()).setPosOrientation(startPosPhi);
+
+        return fc.cell[currentXcell][currentYcell];
     }
 
     //<editor-fold defaultstate="collapsed" desc="getter and setter">
@@ -1072,9 +1115,9 @@ public class Drive extends Thread
 
         comView.start();
 
-        drive.setStartCell(7, 6);
-        drive.setEndTarget(4, 5);
-        drive.setStartPosPhi(270);
+        drive.setStartCell(1, 1);
+        drive.setEndTarget(1, 4);
+        drive.setStartPosPhi(180);
 
         drive.start();
 
