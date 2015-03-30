@@ -15431,3 +15431,9 @@
 2014-07-21 19:28:51,510 DEBUG [main] Laser Factory created 
 2014-07-21 19:28:51,512 DEBUG [main] Laser created 
 2014-07-21 19:28:51,514 INFO  [main] Initialize TiM55x 
+2015-03-03 17:57:10,871 DEBUG [main] Laser Factory created 
+2015-03-03 17:57:10,886 DEBUG [main] Laser created 
+2015-03-03 17:57:10,889 INFO  [main] Initialize TiM55x 
+2015-03-03 17:57:31,898 FATAL [main] Not possible to initalize Laser. Error Message: Connection timed out: connect 
+2015-03-16 19:43:02,510 DEBUG [main] Laser Factory created 
+2015-03-16 19:43:02,534 DEBUG [main] Laser created 

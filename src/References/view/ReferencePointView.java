@@ -5,6 +5,7 @@ import References.AReferencePoint;
 import References.ReferencePoint;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 
 /**
  *
@@ -22,8 +23,9 @@ public class ReferencePointView
     
     public void drawReferencePoint(ReferencePoint drawingReference, Graphics g)
     {        
-        int x = guiReference.calculateGuiXPosition(drawingReference) - DIAMETER/2;
-        int y = guiReference.calculateGuiYPosition(drawingReference) - DIAMETER/2;
+        Point calculatePointInGUI = guiReference.calculatePointInGUI(drawingReference, new Point(0,0));
+        int x = calculatePointInGUI.x - DIAMETER/2;
+        int y = calculatePointInGUI.y - DIAMETER/2;
 
         g.setColor(Color.BLACK);
         g.fillOval(x, y, DIAMETER, DIAMETER);

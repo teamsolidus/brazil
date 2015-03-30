@@ -10,90 +10,81 @@ import java.awt.Point;
  */
 public class GUIReference
 {
-    private final int X_POS, Y_POS;
-    private final int GUI_SCALE;
-    private final int GUI_WIDTH, GUI_HEIGHT;
+    private int xPos, yPos;
+    private int scale;
+    private int guiWidth, guiHeight;
     
     /**
      * 
-     * @param x Not scaled Distance from ReferencePoint to GUI Reference
-     * @param y Not scalled Distance from ReferencePoint to GUI Reference
-     * @param scale 
-     * @param width Not scaled width from gui
-     * @param height Not scaled height from gui
+     * @param xPos Distance in pixels from the left top corner of the gui to the reference
+     * @param yPos Distance in pixels from the left top corner of the gui to the reference
+     * @param scale scale factor in 1000 / x
+     * @param width width from gui in pixels
+     * @param height height from gui in pixels
      */
-    public GUIReference(int x, int y, int scale, int width, int height)
+    public GUIReference(int xPos, int yPos, int scale, int width, int height)
     {
-        this.X_POS = x;
-        this.Y_POS = y;
-        this.GUI_SCALE = scale;
-        this.GUI_WIDTH = width/scale;
-        this.GUI_HEIGHT = height/scale;
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.scale = scale;
+        this.guiWidth = width;
+        this.guiHeight = height;
     }
     
-    public int calculateGuiXPosition(AReferencePoint otherReference)
+    public Point calculatePointInGUI(AReferencePoint reference, Point point)
     {
-        return this.calculateGuiXPosition(otherReference.getAbsolutX());
-    }
-    
-    public int calculateGuiXPosition(int absoluteX)
-    {
-        return ((this.X_POS*-1) + absoluteX)/this.GUI_SCALE;
-    }
-    
-    public int calculateGuiYPosition(AReferencePoint otherReference)
-    {
-        return this.calculateGuiYPosition(otherReference.getAbsolutY());
-    }
-    
-    public int calculateGuiYPosition(int absoluteY)
-    {
-        return (this.Y_POS - absoluteY)/this.GUI_SCALE;
-    }
-    
-    public Point calculateGuiPoint(AReferencePoint otherReference)
-    {
-        int tempX = ((this.X_POS*-1) + otherReference.getAbsolutX())/this.GUI_SCALE;
-        int tempY = (this.Y_POS - otherReference.getAbsolutY())/this.GUI_SCALE;
+        int tempX = this.calculateGuiDistance(reference.getAbsolutX() + point.x);
+        int tempY = this.calculateGuiDistance(reference.getAbsolutY() - point.y);
         
-        return new Point(tempX, tempY);
-    }
-    
-    public Point calculateGuiPoint(AReferencePoint reference, Point point)
-    {
-        int tempX = ((this.X_POS*-1) + reference.getAbsolutX() + point.x)/this.GUI_SCALE;
-        int tempY = (this.Y_POS - reference.getAbsolutY() - point.y)/this.GUI_SCALE;
-        
-        return new Point(tempX, tempY);
+        return new Point(this.xPos + tempX, this.yPos + tempY);
     }
     
     public int calculateGuiDistance(int value)
     {
-        return value/this.GUI_SCALE;
+        float realValue = (float)((float)value/(float)this.scale) * 1000;
+        
+        return (int)realValue;
     }
     
-    // Getter & Setter
+    // getter
     public int getGuiScale()
     {
-        return this.GUI_SCALE;
+        return this.scale;
     }
     
     public int getGuiWidth()
     {
-        return this.GUI_HEIGHT;
+        return this.guiHeight;
     }
     
     public int getGuiLength()
     {
-        return this.GUI_WIDTH;
+        return this.guiWidth;
     }
     
-    /**
-     * Refer to the zero point, not to the gui reference. Unscaled!
-     * @return 
-     */
-    public int getXRight()
+    // setter
+    public void setXPos(int xPos)
     {
-        return 0;
+        this.xPos = xPos;
+    }
+
+    public void setYPos(int yPos)
+    {
+        this.yPos = yPos;
+    }
+
+    public void setScale(int scale)
+    {
+        this.scale = scale;
+    }
+
+    public void setGUIWidth(int guiWidth)
+    {
+        this.guiWidth = guiWidth;
+    }
+
+    public void setGUIHeight(int guiHeight)
+    {
+        this.guiHeight = guiHeight;
     }
 }
