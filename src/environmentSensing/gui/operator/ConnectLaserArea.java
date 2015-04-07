@@ -15,7 +15,7 @@ import javax.swing.JPanel;
  *
  * @author Simon Bühlmann
  */
-public class AdminArea extends JPanel implements ActionListener
+public class ConnectLaserArea extends JPanel implements ActionListener
 {
     // modell
     private LaserscannerFascade laserscanner;
@@ -29,7 +29,7 @@ public class AdminArea extends JPanel implements ActionListener
     private final static String CONNECT_LASER = "connect laser";
     private final static String DISCONNECT_LASER = "disconnect laser";
 
-    public AdminArea(LaserscannerFascade laserscanner)
+    public ConnectLaserArea(LaserscannerFascade laserscanner)
     {
         this.laserscanner = laserscanner;
         

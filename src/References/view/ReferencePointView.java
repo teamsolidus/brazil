@@ -14,14 +14,8 @@ import java.awt.Point;
 public class ReferencePointView
 {
     private static int DIAMETER = 20;
-    private GUIReference guiReference;
-    
-    public ReferencePointView(GUIReference guiReference)
-    {
-        this.guiReference = guiReference;
-    }
-    
-    public void drawReferencePoint(ReferencePoint drawingReference, Graphics g)
+
+    public static void drawReferencePoint(GUIReference guiReference, AReferencePoint drawingReference, Graphics g)
     {        
         Point calculatePointInGUI = guiReference.calculatePointInGUI(drawingReference, new Point(0,0));
         int x = calculatePointInGUI.x - DIAMETER/2;
@@ -36,10 +30,11 @@ public class ReferencePointView
         g.fillArc(x+2, y+2, DIAMETER-4, DIAMETER-4, 180, 90);
     }
     
-    public void drawAbsoluteReferencePoint(AReferencePoint drawingReference, Graphics g)
+    public static void drawAbsoluteReferencePoint(GUIReference guiReference, AReferencePoint drawingReference, Graphics g)
     {        
-        int x = guiReference.calculateGuiXPosition(drawingReference) - DIAMETER/2;
-        int y = guiReference.calculateGuiYPosition(drawingReference) - DIAMETER/2;
+        Point calculatePointInGUI = guiReference.calculatePointInGUI(drawingReference, new Point(0,0));
+        int x = calculatePointInGUI.x - DIAMETER/2;
+        int y = calculatePointInGUI.y - DIAMETER/2;
         
         g.setColor(Color.BLACK);
         g.fillOval(x-2, y-2, DIAMETER+4, DIAMETER+4);

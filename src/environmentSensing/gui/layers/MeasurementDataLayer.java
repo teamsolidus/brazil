@@ -2,6 +2,7 @@ package environmentSensing.gui.layers;
 
 import References.AbsoluteReferencePoint;
 import References.view.GUIReference;
+import References.view.ReferencePointView;
 import environmentSensing.scandatahandling.coordinates.CoordinatesScandata;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -35,10 +36,12 @@ public class MeasurementDataLayer
     
     public void drawMeasuredResult(Graphics g)
     {
-        Point newPoint = guiReference.calculatePointInGUI(AbsoluteReferencePoint.getInstance(), new Point(0,0));
+
 
         g.setColor(Color.RED);
-        g.fillOval(newPoint.x - DIAMETER_REFERENCE_POINT / 2, newPoint.y - DIAMETER_REFERENCE_POINT / 2, DIAMETER_REFERENCE_POINT, DIAMETER_REFERENCE_POINT);
+        ReferencePointView.drawAbsoluteReferencePoint(guiReference, AbsoluteReferencePoint.getInstance(), g);
+        
+        //g.fillOval(newPoint.x - DIAMETER_REFERENCE_POINT / 2, newPoint.y - DIAMETER_REFERENCE_POINT / 2, DIAMETER_REFERENCE_POINT, DIAMETER_REFERENCE_POINT);
         
         if (this.scandatas != null)
         {

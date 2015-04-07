@@ -10,6 +10,7 @@ import environmentSensing.scandatahandling.IScanData;
 import environmentSensing.scandatahandling.IScanMeasurementData;
 import environmentSensing.scandatahandling.coordinates.CoordinatesCalculater;
 import environmentSensing.scandatahandling.coordinates.CoordinatesScandata;
+import environmentSensing.scandatahandling.filters.AverageFilter;
 import environmentSensing.scandatahandling.scandata.ScandataFactory;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class LaserscannerFascade implements ILaserscannerOperator, ILaserscanner
 {
     private ILaserscanner laserscanner;
     private CoordinatesCalculater coordinatesCalculater;
+    private AverageFilter averageFilter;
     private boolean connected;
     
     private List<ILaserscannerFascadeListener> listeners;
@@ -84,7 +86,20 @@ public class LaserscannerFascade implements ILaserscannerOperator, ILaserscanner
         List<CoordinatesScandata> coordinates = new ArrayList<>();
         
         IScanData scanData = ScandataFactory.create(data);
-        for(IScanMeasurementData measurementData : scanData.getScanMeasurementData())
+        
+        // filter data
+        List<IScanMeasurementData> calculatedAverage;
+        if(this.averageFilter != null)
+        {
+            calculatedAverage = this.averageFilter.calculateAverage(scanData);
+        }
+        else
+        {
+            calculatedAverage = scanData.getScanMeasurementData();
+        }
+        
+        // calculate coordinates
+        for(IScanMeasurementData measurementData : calculatedAverage)
         {
             coordinates.add(CoordinatesCalculater.calculateCoordinates(measurementData));
         }
@@ -135,6 +150,16 @@ public class LaserscannerFascade implements ILaserscannerOperator, ILaserscanner
     public void removeListener(ILaserscannerFascadeListener listener)
     {
         this.listeners.remove(listener);
+    }
+    
+    public synchronized void setAverageFilter(int bufferSize, boolean removeHighestAndLowest)
+    {
+        this.averageFilter = new AverageFilter(bufferSize, removeHighestAndLowest);
+    }
+    
+    public synchronized void removeAverageFilter()
+    {
+        this.averageFilter = null;
     }
     
     // private methods
